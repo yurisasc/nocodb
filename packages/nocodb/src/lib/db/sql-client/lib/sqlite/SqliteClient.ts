@@ -1475,6 +1475,8 @@ class SqliteClient extends KnexClient {
     const result = new Result();
     log.api(`${_func}:args:`, args);
 
+    let synchronous = false;
+
     try {
       args.table = args.tn;
       const originalColumns = args.originalColumns;
@@ -1491,7 +1493,7 @@ class SqliteClient extends KnexClient {
 
         if (args.columns[i].altered & 4) {
           // col remove
-          upQuery += await this.alterTableRemoveColumn(
+          upQuery += this.alterTableRemoveColumn(
             args.table,
             args.columns[i],
             oldColumn,
@@ -1504,6 +1506,7 @@ class SqliteClient extends KnexClient {
             downQuery
           );
         } else if (args.columns[i].altered & 2 || args.columns[i].altered & 8) {
+          synchronous = true;
           // col edit
           upQuery += this.alterTableChangeColumn(
             args.table,
@@ -1516,8 +1519,7 @@ class SqliteClient extends KnexClient {
           //   args.table,
           //   oldColumn,
           //   args.columns[i],
-          //   downQuery,
-          //             this.sqlClient
+          //   downQuery
           // );
         } else if (args.columns[i].altered & 1) {
           // col addition
@@ -1528,12 +1530,11 @@ class SqliteClient extends KnexClient {
             upQuery
           );
           downQuery += ';';
-          // downQuery += alterTableRemoveColumn(
+          // downQuery += this.alterTableRemoveColumn(
           //   args.table,
           //   args.columns[i],
           //   oldColumn,
-          //   downQuery,
-          //             this.sqlClient
+          //   downQuery
           // );
         }
       }
@@ -1544,22 +1545,18 @@ class SqliteClient extends KnexClient {
         upQuery,
         this.sqlClient
       );
-      //downQuery += alterTablePK(args.originalColumns, args.columns, downQuery);
 
-      if (upQuery) {
-        //upQuery = `ALTER TABLE ${args.columns[0].tn} ${upQuery};`;
-        //downQuery = `ALTER TABLE ${args.columns[0].tn} ${downQuery};`;
-      }
-
-      await Promise.all(
-        upQuery.split(';').map(async (query) => {
+      if (synchronous) {
+        for (const query of upQuery.split(';')) {
           if (query.trim().length) await this.sqlClient.raw(query);
-        })
-      );
-
-      // await this.sqlClient.raw(upQuery);
-
-      console.log(upQuery);
+        }
+      } else {
+        await Promise.all(
+          upQuery.split(';').map(async (query) => {
+            if (query.trim().length) await this.sqlClient.raw(query);
+          })
+        );
+      }
 
       const afterUpdate = await this.afterTableUpdate(args);
 
@@ -1912,16 +1909,10 @@ class SqliteClient extends KnexClient {
     return query;
   }
 
-  async alterTableRemoveColumn(t, n, _o, _existingQuery) {
-    // let query = existingQuery ? "," : "";
-    // query += ` DROP COLUMN ${n.cn}`;
-    // query = existingQuery ? query : `ALTER TABLE "${t}" ${query};`;
-    // return query;
-    await this.sqlClient.schema.alterTable(t, (tb) => {
-      tb.dropColumn(n.cn);
-    });
-
-    return '';
+  alterTableRemoveColumn(t, n, _o, existingQuery) {
+    let query = existingQuery ? ',' : '';
+    query += this.genQuery(`ALTER TABLE ?? DROP COLUMN ??;`, [t, n.cn]);
+    return query;
   }
 
   createTableColumn(t, n, o, existingQuery) {
@@ -1956,11 +1947,24 @@ class SqliteClient extends KnexClient {
     const defaultValue = getDefaultValue(n);
     let shouldSanitize = true;
     if (change === 2) {
-      query += this.genQuery(
-        `ALTER TABLE ?? RENAME COLUMN ?? TO ??`,
-        [t, o.cn, n.cn],
+      let q1 = this.genQuery(
+        `ALTER TABLE ?? RENAME COLUMN ?? TO ??;`,
+        [t, o.cn, `${o.cno}_old`],
         shouldSanitize
       );
+      
+      let q2 = ''
+      q2 += this.genQuery(` ADD ?? ${n.dt}`, [n.cn], shouldSanitize);
+      q2 += n.dtxp && n.dt !== 'text' ? `(${n.dtxp})` : '';
+      q2 += n.cdf ? (n.cdf.includes(',') ? ` DEFAULT ('${n.cdf}')` : ` DEFAULT ${n.cdf}`) : ' ';
+      q2 += n.rqd ? ` NOT NULL` : ' ';
+      q2 = this.genQuery(`ALTER TABLE ?? ${q2};`, [t], shouldSanitize);
+
+      let q3 = this.genQuery(`UPDATE ?? SET ?? = ??;`, [t, n.cn, `${o.cno}_old`], shouldSanitize);
+
+      let q4 = this.genQuery(`ALTER TABLE ?? DROP COLUMN ??;`, [t, `${o.cno}_old`], shouldSanitize);
+
+      query = `${q1}${q2}${q3}${q4}`;
     } else if (change === 0) {
       query = existingQuery ? ',' : '';
       query += this.genQuery(`?? ${n.dt}`, [n.cn], shouldSanitize);
@@ -1968,7 +1972,6 @@ class SqliteClient extends KnexClient {
       query += n.cdf ? (n.cdf.includes(',') ? ` DEFAULT ('${n.cdf}')` : ` DEFAULT ${n.cdf}`) : ' ';
       query += n.rqd ? ` NOT NULL` : ' ';
     } else if (change === 1) {
-      shouldSanitize = true;
       query += this.genQuery(` ADD ?? ${n.dt}`, [n.cn], shouldSanitize);
       query += n.dtxp && n.dt !== 'text' ? `(${n.dtxp})` : '';
       query += n.cdf ? (n.cdf.includes(',') ? ` DEFAULT ('${n.cdf}')` : ` DEFAULT ${n.cdf}`) : ' ';
