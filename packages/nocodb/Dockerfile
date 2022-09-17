@@ -18,7 +18,7 @@ RUN cp $GOPATH/bin/litestream /usr/src/lt
 ###########
 # Builder
 ###########
-FROM node:12 as builder
+FROM node:12-alpine3.15 as builder
 WORKDIR /usr/src/app
 
 # Copy application dependency manifests to the container image.
@@ -41,7 +41,7 @@ RUN npm ci --production --quiet \
 ##########
 # Runner
 ##########
-FROM alpine:3.12
+FROM alpine:3.15
 WORKDIR /usr/src/app
 
 ENV NC_DOCKER 0.6
