@@ -35,7 +35,9 @@ const options = computed<SelectProps['options']>(() =>
       value: c.id,
       label: c.title,
       icon: h(
-        isVirtualCol(c) ? resolveComponent('SmartsheetHeaderVirtualCellIcon') : resolveComponent('SmartsheetHeaderCellIcon'),
+        isVirtualCol(c)
+          ? resolveComponent('LazySmartsheetHeaderVirtualCellIcon')
+          : resolveComponent('LazySmartsheetHeaderCellIcon'),
         {
           columnMeta: c,
         },

@@ -111,9 +111,12 @@ const coverOptions = computed<SelectProps['options']>(() => {
 })
 
 const getIcon = (c: ColumnType) =>
-  h(isVirtualCol(c) ? resolveComponent('SmartsheetHeaderVirtualCellIcon') : resolveComponent('SmartsheetHeaderCellIcon'), {
-    columnMeta: c,
-  })
+  h(
+    isVirtualCol(c) ? resolveComponent('LazySmartsheetHeaderVirtualCellIcon') : resolveComponent('LazySmartsheetHeaderCellIcon'),
+    {
+      columnMeta: c,
+    },
+  )
 </script>
 
 <template>

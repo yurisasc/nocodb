@@ -3,6 +3,7 @@ import type { TableType, ViewType } from 'nocodb-sdk'
 import { UITypes, isSystemColumn, isVirtualCol } from 'nocodb-sdk'
 import type { Ref } from 'vue'
 import {
+  message,
   FieldsInj,
   IsFormInj,
   MetaInj,
