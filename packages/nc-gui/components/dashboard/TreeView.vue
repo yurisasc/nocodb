@@ -140,7 +140,7 @@ const addTableTab = (table: TableType) => {
   addTab({ title: table.title, id: table.id, type: table.type as TabType })
 }
 
-function openRenameTableDialog(table: TableType, rightClick = false) {
+function openRenameTableDialog(table: TableType, baseId: string, rightClick = false) {
   $e(rightClick ? 'c:table:rename:navdraw:right-click' : 'c:table:rename:navdraw:options')
 
   const isOpen = ref(true)
@@ -148,6 +148,7 @@ function openRenameTableDialog(table: TableType, rightClick = false) {
   const { close } = useDialog(resolveComponent('DlgTableRename'), {
     'modelValue': isOpen,
     'tableMeta': table,
+    'baseId': baseId,
     'onUpdate:modelValue': closeDialog,
   })
 
@@ -368,7 +369,7 @@ const onSearchCloseIconClick = () => {
 
                           <template #overlay>
                             <a-menu class="!py-0 rounded text-sm">
-                              <a-menu-item v-if="isUIAllowed('table-rename')" @click="openRenameTableDialog(table)">
+                              <a-menu-item v-if="isUIAllowed('table-rename')" @click="openRenameTableDialog(table, base.id)">
                                 <div class="nc-project-menu-item" :data-testid="`sidebar-table-rename-${table.title}`">
                                   {{ $t('general.rename') }}
                                 </div>
@@ -533,7 +534,7 @@ const onSearchCloseIconClick = () => {
                                 <a-menu-item
                                   v-if="isUIAllowed('table-rename')"
                                   :data-testid="`sidebar-table-rename-${table.title}`"
-                                  @click="openRenameTableDialog(table)"
+                                  @click="openRenameTableDialog(table, base.id)"
                                 >
                                   <div class="nc-project-menu-item">
                                     {{ $t('general.rename') }}
@@ -570,7 +571,10 @@ const onSearchCloseIconClick = () => {
       <template v-if="!isSharedBase" #overlay>
         <a-menu class="!py-0 rounded text-sm">
           <template v-if="contextMenuTarget.type === 'table'">
-            <a-menu-item v-if="isUIAllowed('table-rename')" @click="openRenameTableDialog(contextMenuTarget.value, true)">
+            <a-menu-item
+              v-if="isUIAllowed('table-rename')"
+              @click="openRenameTableDialog(contextMenuTarget.value, base.id, true)"
+            >
               <div class="nc-project-menu-item">
                 {{ $t('general.rename') }}
               </div>
@@ -597,6 +601,10 @@ const onSearchCloseIconClick = () => {
     <a-divider class="!my-0" />
 
     <div class="flex items-start flex-col justify-start px-2 py-3 gap-2">
+      <LazyGeneralAddBaseButton
+        class="color-transition py-1.5 px-2 text-primary font-bold cursor-pointer select-none hover:text-accent"
+      />
+
       <LazyGeneralShareBaseButton
         class="color-transition py-1.5 px-2 text-primary font-bold cursor-pointer select-none hover:text-accent"
       />
