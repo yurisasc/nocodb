@@ -82,6 +82,10 @@ const onAttachRecord = () => {
   childListDlg.value = false
   listItemsDlg.value = true
 }
+
+
+const loadListItemsComp = ref(false)
+const loadChildListItemsComp = ref(false)
 </script>
 
 <template>
@@ -104,20 +108,23 @@ const onAttachRecord = () => {
       <div v-if="!isLocked" class="flex justify-end gap-1 min-h-[30px] items-center">
         <MdiArrowExpand
           class="text-sm nc-action-icon text-gray-500/50 hover:text-gray-500 nc-arrow-expand"
-          @click="childListDlg = true"
+          @click="() => { childListDlg = true; loadChildListItemsComp = true }"
         />
 
         <MdiPlus
           v-if="!readOnly && isUIAllowed('xcDatatableEditable')"
           class="text-sm nc-action-icon text-gray-500/50 hover:text-gray-500 nc-plus"
-          @click="listItemsDlg = true"
+          @click="() => { listItemsDlg = true; loadListItemsComp = true }"
         />
       </div>
     </template>
 
-    <LazyVirtualCellComponentsListItems v-model="listItemsDlg" />
+    <LazyVirtualCellComponentsListItems
+      v-if="loadListItemsComp"
+      v-model="listItemsDlg" />
 
     <LazyVirtualCellComponentsListChildItems
+      v-if="loadChildListItemsComp"
       v-model="childListDlg"
       :cell-value="localCellValue"
       @attach-record="onAttachRecord"

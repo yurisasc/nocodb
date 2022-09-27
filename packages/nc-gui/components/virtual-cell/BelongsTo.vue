@@ -70,6 +70,9 @@ const unlinkRef = async (rec: Record<string, any>) => {
     await unlink(rec)
   }
 }
+
+
+const loadListItemsComp = ref(false)
 </script>
 
 <template>
@@ -91,11 +94,12 @@ const unlinkRef = async (rec: Record<string, any>) => {
       <component
         :is="addIcon"
         class="text-sm nc-action-icon text-gray-500/50 hover:text-gray-500 select-none group-hover:(text-gray-500) nc-plus"
-        @click="listItemsDlg = true"
+        @click="() => { listItemsDlg = true; loadListItemsComp = true }"
       />
     </div>
 
-    <LazyVirtualCellComponentsListItems v-model="listItemsDlg" @attach-record="listItemsDlg = true" />
+    <LazyVirtualCellComponentsListItems
+      v-if="loadListItemsComp" v-model="listItemsDlg" @attach-record="listItemsDlg = true" />
   </div>
 </template>
 
