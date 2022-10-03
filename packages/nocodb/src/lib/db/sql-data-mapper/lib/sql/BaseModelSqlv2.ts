@@ -1546,6 +1546,10 @@ class BaseModelSqlv2 {
     return this.clientType === 'pg';
   }
 
+  get isOracle() {
+    return this.clientType === 'oracledb';
+  }
+
   get isMySQL() {
     return this.clientType === 'mysql2' || this.clientType === 'mysql';
   }
@@ -2359,7 +2363,9 @@ class BaseModelSqlv2 {
       ? (await this.dbDriver.raw(query))?.rows
       : query.slice(0, 6) === 'select' && !this.isMssql
       ? await this.dbDriver.from(
-          this.dbDriver.raw(query).wrap('(', ') __nc_alias')
+          this.dbDriver
+            .raw(query)
+            .wrap('(', this.isOracle ? ')' : ') __nc_alias')
         )
       : await this.dbDriver.raw(query);
   }
