@@ -43,7 +43,7 @@ const menuRef = $ref<HTMLLIElement>()
 
 let filterQuery = $ref('')
 
-const activeTable = computed(() => ([TabType.TABLE, TabType.VIEW].includes(activeTab.value?.type) ? activeTab.value.title : null))
+const activeTable = computed(() => ([TabType.TABLE, TabType.VIEW].includes(activeTab.value?.type) ? activeTab.value.id : null))
 
 const tablesById = $computed(() =>
   tables.value?.reduce<Record<string, TableType>>((acc, table) => {
@@ -339,7 +339,7 @@ const onSearchCloseIconClick = () => {
                     :key="table.id"
                     v-e="['a:table:open']"
                     :class="[
-                      { hidden: !filteredTables?.includes(table), active: activeTable === table.title },
+                      { hidden: !filteredTables?.includes(table), active: activeTable === table.id },
                       `nc-project-tree-tbl nc-project-tree-tbl-${table.title}`,
                     ]"
                     class="nc-tree-item text-sm cursor-pointer group"
@@ -501,7 +501,7 @@ const onSearchCloseIconClick = () => {
                       :key="table.id"
                       v-e="['a:table:open']"
                       :class="[
-                        { hidden: !filteredTables?.includes(table), active: activeTable === table.title },
+                        { hidden: !filteredTables?.includes(table), active: activeTable === table.id },
                         `nc-project-tree-tbl nc-project-tree-tbl-${table.title}`,
                       ]"
                       class="nc-tree-item text-sm cursor-pointer group"
