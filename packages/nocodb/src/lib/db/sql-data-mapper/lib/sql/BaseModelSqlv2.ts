@@ -1386,7 +1386,7 @@ class BaseModelSqlv2 {
       let response;
       // const driver = trx ? trx : this.dbDriver;
 
-      this.processInsertObject(insertObj);
+      this.processInsertOrUpdateObject(insertObj);
 
       const query = this.dbDriver(this.tnPath).insert(insertObj);
       if (this.isPg || this.isMssql) {
@@ -1439,7 +1439,7 @@ class BaseModelSqlv2 {
     }
   }
 
-  private processInsertObject(insertObj: Record<string, any>) {
+  private processInsertOrUpdateObject(insertObj: Record<string, any>) {
     // if oracle use `TO_DATE` function to parse date STRING
     if (this.isOracle) {
       for (const col of this.model.columns) {
@@ -1523,6 +1523,8 @@ class BaseModelSqlv2 {
       await this.validate(data);
 
       await this.beforeUpdate(data, trx, cookie);
+
+      this.processInsertOrUpdateObject(updateObj);
 
       const query = this.dbDriver(this.tnPath)
         .update(updateObj)
