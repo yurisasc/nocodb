@@ -55,7 +55,7 @@ const [setup, use] = useInjectionState(() => {
   const projectBaseType = $computed(() => project.value?.bases?.[0]?.type || '')
 
   const sqlUi = computed(
-    () => SqlUiFactory.create({ client: projectBaseType }) as Exclude<ReturnType<typeof SqlUiFactory['create']>, typeof OracleUi>,
+    () => SqlUiFactory.create({ client: projectBaseType }) as ReturnType<typeof SqlUiFactory['create']>,
   )
 
   const isMysql = computed(() => ['mysql', 'mysql2'].includes(projectBaseType))
