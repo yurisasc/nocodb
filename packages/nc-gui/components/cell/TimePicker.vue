@@ -10,13 +10,13 @@ const { modelValue } = defineProps<Props>()
 
 const emit = defineEmits(['update:modelValue'])
 
-const { isMysql } = useProject()
+const { isMysql, isOracle } = useProject()
 
 const readOnly = inject(ReadonlyInj, false)
 
 let isTimeInvalid = $ref(false)
 
-const dateFormat = isMysql.value ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD HH:mm:ssZ'
+const dateFormat = isMysql.value ||isOracle.value ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD HH:mm:ssZ'
 
 const localState = $computed({
   get() {

@@ -60,6 +60,7 @@ const [setup, use] = useInjectionState(() => {
 
   const isMysql = computed(() => ['mysql', 'mysql2'].includes(projectBaseType))
   const isMssql = computed(() => projectBaseType === 'mssql')
+  const isOracle = computed(() => projectBaseType === 'oracledb')
   const isPg = computed(() => projectBaseType === 'pg')
   const isSharedBase = computed(() => projectType === 'base')
 
@@ -155,6 +156,7 @@ const [setup, use] = useInjectionState(() => {
     loadTables,
     isMysql,
     isMssql,
+    isOracle,
     isPg,
     sqlUi,
     isSharedBase,
