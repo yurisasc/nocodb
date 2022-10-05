@@ -123,6 +123,7 @@ const {
   isMultiSelect,
   isPercent,
   isPhoneNumber,
+  isCheckbox
 } = useColumn(column)
 
 const syncAndNavigate = (dir: NavigateDir) => {
@@ -138,7 +139,7 @@ const syncAndNavigate = (dir: NavigateDir) => {
 
 <template>
   <div
-    class="nc-cell w-full h-full"
+    class="nc-cell w-full h-fl"
     :class="{ 'text-blue-600': isPrimary && !virtual && !isForm }"
     @keydown.stop.left
     @keydown.stop.right
@@ -148,7 +149,7 @@ const syncAndNavigate = (dir: NavigateDir) => {
     @keydown.stop.shift.enter.exact="syncAndNavigate(NavigateDir.PREV)"
   >
     <LazyCellTextArea v-if="isTextArea" v-model="vModel" />
-    <LazyCellCheckbox v-else-if="isBoolean" v-model="vModel" />
+    <LazyCellCheckbox v-else-if="isCheckbox" v-model="vModel" />
     <LazyCellAttachment v-else-if="isAttachment" v-model="vModel" :row-index="props.rowIndex" />
     <LazyCellSingleSelect v-else-if="isSingleSelect" v-model="vModel" />
     <LazyCellMultiSelect v-else-if="isMultiSelect" v-model="vModel" />

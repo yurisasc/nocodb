@@ -19,6 +19,7 @@ export function useColumn(column: Ref<ColumnType | undefined>) {
 
   const dataTypeLow = computed(() => column.value?.dt?.toLowerCase())
   const isBoolean = computed(() => abstractType.value === 'boolean')
+  const isCheckbox = computed(() => abstractType.value === 'boolean' || column.value?.uidt === UITypes.Checkbox)
   const isString = computed(() => uiDatatype.value === UITypes.SingleLineText || abstractType.value === 'string')
   const isTextArea = computed(() => uiDatatype.value === UITypes.LongText)
   const isInt = computed(() => abstractType.value === 'integer')
@@ -93,5 +94,6 @@ export function useColumn(column: Ref<ColumnType | undefined>) {
     isPercent,
     isPhoneNumber,
     isSpecificDBType,
+    isCheckbox
   }
 }
