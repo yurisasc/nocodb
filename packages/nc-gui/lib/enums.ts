@@ -19,7 +19,7 @@ export enum ClientType {
   PG = 'pg',
   SQLITE = 'sqlite3',
   VITESS = 'vitess',
-  ORACLEDB = 'oracledb'
+  ORACLEDB = 'oracledb',
 }
 
 export enum Language {

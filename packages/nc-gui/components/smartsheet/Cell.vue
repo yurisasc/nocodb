@@ -109,7 +109,6 @@ const {
   isYear,
   isDateTime,
   isTime,
-  isBoolean,
   isDuration,
   isRating,
   isCurrency,
@@ -123,7 +122,7 @@ const {
   isMultiSelect,
   isPercent,
   isPhoneNumber,
-  isCheckbox
+  isCheckbox,
 } = useColumn(column)
 
 const syncAndNavigate = (dir: NavigateDir) => {
@@ -139,7 +138,7 @@ const syncAndNavigate = (dir: NavigateDir) => {
 
 <template>
   <div
-    class="nc-cell w-full h-fl"
+    class="nc-cell w-full h-full"
     :class="{ 'text-blue-600': isPrimary && !virtual && !isForm }"
     @keydown.stop.left
     @keydown.stop.right

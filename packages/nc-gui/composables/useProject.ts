@@ -1,4 +1,4 @@
-import type { OracleUi, ProjectType, TableType } from 'nocodb-sdk'
+import type { ProjectType, TableType } from 'nocodb-sdk'
 import { SqlUiFactory } from 'nocodb-sdk'
 import { isString } from '@vueuse/core'
 import {
@@ -54,9 +54,7 @@ const [setup, use] = useInjectionState(() => {
 
   const projectBaseType = $computed(() => project.value?.bases?.[0]?.type || '')
 
-  const sqlUi = computed(
-    () => SqlUiFactory.create({ client: projectBaseType }) as ReturnType<typeof SqlUiFactory['create']>,
-  )
+  const sqlUi = computed(() => SqlUiFactory.create({ client: projectBaseType }) as ReturnType<typeof SqlUiFactory['create']>)
 
   const isMysql = computed(() => ['mysql', 'mysql2'].includes(projectBaseType))
   const isMssql = computed(() => projectBaseType === 'mssql')

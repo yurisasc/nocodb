@@ -94,6 +94,6 @@ export function useColumn(column: Ref<ColumnType | undefined>) {
     isPercent,
     isPhoneNumber,
     isSpecificDBType,
-    isCheckbox
+    isCheckbox,
   }
 }
