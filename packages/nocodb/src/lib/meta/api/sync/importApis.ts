@@ -2,12 +2,14 @@ import { Request, Router } from 'express';
 // import { Queue } from 'bullmq';
 // import axios from 'axios';
 import catchError from '../../helpers/catchError';
-import { Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import NocoJobs from '../../../jobs/NocoJobs';
 import job, { AirtableSyncConfig } from './helpers/job';
 import SyncSource from '../../../models/SyncSource';
 import Noco from '../../../Noco';
 import { genJwt } from '../userApi/helpers';
+import { NcError } from '../../helpers/catchError';
+
 const AIRTABLE_IMPORT_JOB = 'AIRTABLE_IMPORT_JOB';
 const AIRTABLE_PROGRESS_JOB = 'AIRTABLE_PROGRESS_JOB';
 
@@ -17,13 +19,13 @@ enum SyncStatus {
   FAILED = 'FAILED',
 }
 
-export default (router: Router, clients: { [id: string]: Socket }) => {
+export default (router: Router, sv: Server) => {
   // add importer job handler and progress notification job handler
   NocoJobs.jobsMgr.addJobWorker(AIRTABLE_IMPORT_JOB, job);
   NocoJobs.jobsMgr.addJobWorker(
     AIRTABLE_PROGRESS_JOB,
     ({ payload, progress }) => {
-      clients?.[payload?.id]?.emit('progress', {
+      sv.to(payload?.id).emit('progress', {
         msg: progress?.msg,
         level: progress?.level,
         status: progress?.status,
@@ -75,6 +77,14 @@ export default (router: Router, clients: { [id: string]: Socket }) => {
     catchError(async (req: Request, res) => {
       const syncSource = await SyncSource.get(req.params.syncId);
 
+      if (!syncSource) {
+        NcError.badRequest('Sync source not found!');
+      }
+
+      if (syncSource.enabled === false) {
+        NcError.badRequest('Sync is already triggered!');
+      }
+
       const user = await syncSource.getUser();
       const token = genJwt(user, Noco.getConfig());
 
@@ -89,13 +99,31 @@ export default (router: Router, clients: { [id: string]: Socket }) => {
         baseURL = `http://localhost:${process.env.PORT || 8080}`;
       }
 
+      await SyncSource.update(req.params.syncId, { enabled: false });
+
       NocoJobs.jobsMgr.add<AirtableSyncConfig>(AIRTABLE_IMPORT_JOB, {
-        id: req.query.id,
+        id: req.params.syncId,
         ...(syncSource?.details || {}),
         projectId: syncSource.project_id,
         authToken: token,
         baseURL,
       });
+
+      res.json({});
+    })
+  );
+
+  router.post(
+    '/api/v1/db/meta/syncs/:syncId/abort',
+    catchError(async (req: Request, res) => {
+      const syncSource = await SyncSource.get(req.params.syncId);
+      
+      if (syncSource.enabled === true) {
+        NcError.badRequest('Sync is not triggered!');
+      }
+
+      await SyncSource.update(req.params.syncId, { enabled: true });
+
       res.json({});
     })
   );

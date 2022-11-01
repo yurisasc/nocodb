@@ -45,6 +45,7 @@ let socket: Socket | null
 const syncSource = ref({
   id: '',
   type: 'Airtable',
+  enabled: true,
   details: {
     syncInterval: '15mins',
     syncDirection: 'Airtable to NocoDB',
@@ -121,9 +122,14 @@ async function loadSyncSrc() {
     srcs[0].details = srcs[0].details || {}
     syncSource.value = migrateSync(srcs[0])
     syncSource.value.details.syncSourceUrlOrId = srcs[0].details.shareId
+    if (!syncSource.value.enabled) {
+      step.value = 2
+      socket?.emit('subscribe', syncSource.value.id)
+    }
   } else {
     syncSource.value = {
       id: '',
+      enabled: true,
       type: 'Airtable',
       details: {
         syncInterval: '15mins',
@@ -147,18 +153,29 @@ async function loadSyncSrc() {
 
 async function sync() {
   step.value = 2
+  socket?.emit('subscribe', syncSource.value.id)
   try {
     await $fetch(`/api/v1/db/meta/syncs/${syncSource.value.id}/trigger`, {
       baseURL,
       method: 'POST',
       headers: { 'xc-auth': $state.token.value as string },
-      params: {
-        id: socket?.id,
-      },
     })
   } catch (e: any) {
     message.error(await extractSdkResponseErrorMsg(e))
   }
+}
+
+async function abort() {
+  try {
+    await $fetch(`/api/v1/db/meta/syncs/${syncSource.value.id}/abort`, {
+      baseURL,
+      method: 'POST',
+      headers: { 'xc-auth': $state.token.value as string },
+    })
+  } catch (e: any) {
+    message.error(await extractSdkResponseErrorMsg(e))
+  }
+  step.value = 1
 }
 
 function migrateSync(src: any) {
@@ -217,6 +234,10 @@ onMounted(async () => {
       await loadTables()
       // TODO: add tab of the first table
     }
+  })
+
+  socket.on('disconnect', () => {
+    loadSyncSrc()
   })
 
   await loadSyncSrc()
@@ -381,6 +402,7 @@ onBeforeUnmount(() => {
           <a-button v-if="showGoToDashboardButton" class="mt-4" size="large" @click="dialogShow = false">
             {{ $t('labels.goToDashboard') }}
           </a-button>
+          <a-button v-else class="mt-4" size="large" danger @click="abort()">ABORT</a-button>
         </div>
       </div>
     </div>
