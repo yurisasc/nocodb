@@ -50,9 +50,11 @@ const { copy } = useCopy()
 // create a new sidebar state
 const { isOpen, toggle, toggleHasSidebar } = useSidebar('nc-left-sidebar', { hasSidebar: false, isOpen: false })
 
-const dialogOpen = ref(false)
+const settingDialogOpen = ref(false)
 
-const openDialogKey = ref<string>()
+const storageManagerDialogOpen = ref(false)
+
+const settingDialogOpenKey = ref<string>()
 
 const dropdownOpen = ref(false)
 
@@ -66,9 +68,13 @@ const logout = () => {
   navigateTo('/signin')
 }
 
-function toggleDialog(value?: boolean, key?: string) {
-  dialogOpen.value = value ?? !dialogOpen.value
-  openDialogKey.value = key
+function toggleSettingsDialog(value?: boolean, key?: string) {
+  settingDialogOpen.value = value ?? !settingDialogOpen.value
+  settingDialogOpenKey.value = key
+}
+
+function toggleStorageManagerDialog(value?: boolean) {
+  storageManagerDialogOpen.value = value ?? !storageManagerDialogOpen.value
 }
 
 const handleThemeColor = async (mode: 'swatch' | 'primary' | 'accent', color?: string) => {
@@ -312,10 +318,23 @@ onBeforeUnmount(reset)
                         v-if="isUIAllowed('settings')"
                         v-e="['c:navdraw:project-settings']"
                         class="nc-project-menu-item group"
-                        @click="toggleDialog(true, 'teamAndAuth')"
+                        @click="toggleSettingsDialog(true, 'teamAndAuth')"
                       >
                         <MdiCog class="group-hover:text-accent" />
                         {{ $t('title.teamAndSettings') }}
+                      </div>
+                    </a-menu-item>
+
+                    <!-- Storage Manager -->
+                    <a-menu-item key="teamAndSettings">
+                      <div
+                        v-if="isUIAllowed('storage-manager')"
+                        v-e="['c:navdraw:storage-manager']"
+                        class="nc-project-menu-item group"
+                        @click="toggleStorageManagerDialog(true)"
+                      >
+                        <MdiFileCabinet class="group-hover:text-accent" />
+                        {{ $t('title.storageManager') }}
                       </div>
                     </a-menu-item>
 
@@ -497,7 +516,9 @@ onBeforeUnmount(reset)
     </template>
 
     <div>
-      <LazyDashboardSettingsModal v-model="dialogOpen" :open-key="openDialogKey" />
+      <LazyDashboardSettingsModal v-model="settingDialogOpen" :open-key="settingDialogOpenKey" />
+
+      <LazyDashboardStorageManagerModal v-model="storageManagerDialogOpen" />
 
       <NuxtPage :page-key="$route.params.projectId" />
 
