@@ -157,6 +157,7 @@ declare module '@vue/runtime-core' {
     MdiExport: typeof import('~icons/mdi/export')['default']
     MdiEyeCircleOutline: typeof import('~icons/mdi/eye-circle-outline')['default']
     MdiEyeOffOutline: typeof import('~icons/mdi/eye-off-outline')['default']
+    MdiFileCabinet: typeof import('~icons/mdi/file-cabinet')['default']
     MdiFileDocumentOutline: typeof import('~icons/mdi/file-document-outline')['default']
     MdiFileExcel: typeof import('~icons/mdi/file-excel')['default']
     MdiFileEyeOutline: typeof import('~icons/mdi/file-eye-outline')['default']
