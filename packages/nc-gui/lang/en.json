@@ -188,6 +188,7 @@
     "headLogin": "Log In | NocoDB",
     "resetPassword": "Reset your password",
     "teamAndSettings": "Team & Settings",
+    "storageManager": "Storage Manager",
     "apiDocs": "API Docs",
     "importFromAirtable": "Import From Airtable",
     "generateToken": "Generate Token",
