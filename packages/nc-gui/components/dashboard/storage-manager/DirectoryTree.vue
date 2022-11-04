@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { useStorageManagerStoreOrThrow } from '#imports'
-const { directoryTree, directoryTreeSelectedKeys, directoryTreeExpandedKeys } = useStorageManagerStoreOrThrow()
+import { onMounted, useStorageManagerStoreOrThrow } from '#imports'
+const { loadDirectoryTree, directoryTree, directoryTreeSelectedKeys, directoryTreeExpandedKeys } = useStorageManagerStoreOrThrow()
+
+onMounted(() => loadDirectoryTree())
 </script>
 
 <template>
