@@ -12,7 +12,10 @@ onMounted(() => loadDirectoryTree())
     :tree-data="directoryTree"
   >
     <template #title="{ title }">
-      <span>{{ title }}</span>
+      <div class="flex items-center">
+        <MdiFolderOutline class="text-gray-500 mr-2" />
+        {{ title }}
+      </div>
     </template>
   </a-tree>
 </template>
