@@ -111,7 +111,7 @@ export enum CacheScope {
   MODEL_ROLE_VISIBILITY = 'modelRoleVisibility',
   API_TOKEN = 'apiToken',
   INSTANCE_META = 'instanceMeta',
-  STORAGE = 'storage'
+  STORAGE = 'storage',
 }
 export enum CacheGetType {
   TYPE_ARRAY = 'TYPE_ARRAY',
