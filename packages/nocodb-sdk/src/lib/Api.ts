@@ -209,8 +209,8 @@ export interface FilterListType {
  */
 export interface StorageType {
   id?: string;
-  fk_project_id?: string;
-  fk_base_id?: string;
+  project_id?: string;
+  base_id?: string;
   source?: string;
   meta?: string | object;
 }

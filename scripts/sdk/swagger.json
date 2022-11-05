@@ -7541,10 +7541,10 @@
           "id": {
             "type": "string"
           },
-          "fk_project_id": {
+          "project_id": {
             "type": "string"
           },
-          "fk_base_id": {
+          "base_id": {
             "type": "string"
           },
           "source": {
