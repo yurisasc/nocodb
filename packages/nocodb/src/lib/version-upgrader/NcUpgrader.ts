@@ -5,6 +5,7 @@ import NcMetaIO from '../meta/NcMetaIO';
 import ncProjectEnvUpgrader from './ncProjectEnvUpgrader';
 import ncProjectEnvUpgrader0011045 from './ncProjectEnvUpgrader0011045';
 import ncProjectUpgraderV2_0090000 from './ncProjectUpgraderV2_0090000';
+import ncProjectUpgraderV2_0098000 from './ncProjectUpgraderV2_0098000';
 
 const log = debug('nc:version-upgrader');
 import { Tele } from 'nc-help';
@@ -31,6 +32,7 @@ export default class NcUpgrader {
         { name: '0011043', handler: ncProjectEnvUpgrader },
         { name: '0011045', handler: ncProjectEnvUpgrader0011045 },
         { name: '0090000', handler: ncProjectUpgraderV2_0090000 },
+        { name: '0098000', handler: ncProjectUpgraderV2_0098000 },
       ];
       if (!(await ctx.ncMeta.knexConnection?.schema?.hasTable?.('nc_store'))) {
         return;
@@ -81,7 +83,7 @@ export default class NcUpgrader {
         this.log(`upgrade : Inserting config to meta database`);
         const configObj: any = {};
         const isOld = (await ctx.ncMeta.projectList())?.length;
-        configObj.version = isOld ? '0009000' : process.env.NC_VERSION;
+        configObj.version = isOld ? '0098000' : process.env.NC_VERSION;
         await ctx.ncMeta.metaInsert('', '', 'nc_store', {
           key: NcUpgrader.STORE_KEY,
           value: JSON.stringify(configObj),
