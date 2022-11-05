@@ -2,7 +2,7 @@ import { ColumnType, UITypes } from 'nocodb-sdk';
 import Noco from '../Noco';
 import { NcUpgraderCtx } from './NcUpgrader';
 import { MetaTable } from '../utils/globals';
-// import NcConnectionMgrv2 from '../utils/common/NcConnectionMgrv2';
+import NcConnectionMgrv2 from '../utils/common/NcConnectionMgrv2';
 import Project from '../models/Project';
 import Storage from '../models/Storage';
 
@@ -38,21 +38,17 @@ async function updateAttachement(
 
   const base = project.bases[0];
 
-  // TODO: handle attachment data in external dbs
-  // const knex = NcConnectionMgrv2.get(base);
+  const knex = base.is_meta ? ncMeta.knex : NcConnectionMgrv2.get(base);
 
-  const table = await ncMeta
-    .knex(MetaTable.MODELS)
-    .where({ id: modelId })
-    .first();
+  const table = await knex(MetaTable.MODELS).where({ id: modelId }).first();
 
   const primaryKeys = [];
 
-  const columns: (ColumnType & { project_id?: string })[] = await ncMeta
-    .knex(MetaTable.COLUMNS)
-    .where({
-      fk_model_id: modelId,
-    });
+  const columns: (ColumnType & { project_id?: string })[] = await knex(
+    MetaTable.COLUMNS
+  ).where({
+    fk_model_id: modelId,
+  });
 
   for (const column of columns) {
     if (column.pk) {
@@ -60,9 +56,10 @@ async function updateAttachement(
     }
   }
 
-  const data = (await ncMeta
-    .knex(table.table_name)
-    .select([columnName, ...primaryKeys])) as any;
+  const data = (await knex(table.table_name).select([
+    columnName,
+    ...primaryKeys,
+  ])) as any;
 
   for (const row of data) {
     if (!row[columnName]) continue;
@@ -73,7 +70,7 @@ async function updateAttachement(
           {
             base_id: base.id,
             project_id: projectId,
-            source: 'TODO',
+            source: getStorageSource(attachmentObj),
             meta: JSON.stringify(attachmentObj),
           },
           ncMeta
@@ -85,9 +82,19 @@ async function updateAttachement(
     for (let i = 0; i < primaryKeys.length; i++) {
       where[primaryKeys[i]] = row[primaryKeys[i]];
     }
-    await ncMeta
-      .knex(table.table_name)
+    await knex(table.table_name)
       .where(where)
       .update({ [columnName]: JSON.stringify(updatedAttachmentObjs) });
   }
+}
+
+// TODO(storage): revise the logic
+function getStorageSource(attachmentObj) {
+  const url = attachmentObj?.url;
+  if (url.includes('s3')) {
+    return 'S3';
+  } else if (url.includes('backblaze')) {
+    return 'Backblaze';
+  }
+  return 'Local';
 }
