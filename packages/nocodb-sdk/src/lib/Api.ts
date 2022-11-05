@@ -204,6 +204,17 @@ export interface FilterListType {
   };
 }
 
+/**
+ * Model for Storage Manager
+ */
+export interface StorageType {
+  id?: string;
+  fk_project_id?: string;
+  fk_base_id?: string;
+  source?: string;
+  meta?: string | object;
+}
+
 export interface SortType {
   id?: string;
   fk_model_id?: string;
@@ -1506,6 +1517,114 @@ export class Api<
         path: `/api/v1/db/meta/projects/${projectId}/cost`,
         method: 'GET',
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Read a Storage record under a Project
+     *
+     * @tags Project
+     * @name StorageRead
+     * @request GET:/api/v1/db/meta/projects/{projectId}/storages/{storageId}
+     * @response `200` `StorageType` OK
+     */
+    storageRead: (
+      storageId: string,
+      projectId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<StorageType, any>({
+        path: `/api/v1/db/meta/projects/${projectId}/storages/${storageId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Update a Storage record under a Project
+     *
+     * @tags Project
+     * @name StorageUpdate
+     * @request PATCH:/api/v1/db/meta/projects/{projectId}/storages/{storageId}
+     * @response `200` `any` OK
+     */
+    storageUpdate: (
+      storageId: string,
+      projectId: string,
+      data: object,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/api/v1/db/meta/projects/${projectId}/storages/${storageId}`,
+        method: 'PATCH',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Delete a Storage record under a Project
+     *
+     * @tags Project
+     * @name StorageDelete
+     * @request DELETE:/api/v1/db/meta/projects/{projectId}/storages/{storageId}
+     * @response `200` `void` OK
+     */
+    storageDelete: (
+      storageId: string,
+      projectId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/db/meta/projects/${projectId}/storages/${storageId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * @description Create a storage under a Project
+     *
+     * @tags Project
+     * @name StorageCreate
+     * @request POST:/api/v1/db/meta/projects/{projectId}/storages
+     * @response `200` `StorageType` OK
+     */
+    storageCreate: (
+      projectId: string,
+      data: StorageType,
+      params: RequestParams = {}
+    ) =>
+      this.request<StorageType, any>({
+        path: `/api/v1/db/meta/projects/${projectId}/storages`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description List of storages under a Project
+     *
+     * @tags Project
+     * @name StorageList
+     * @request GET:/api/v1/db/meta/projects/{projectId}/storages
+     * @response `200` `TableListType`
+     */
+    storageList: (
+      projectId: string,
+      query?: {
+        page?: number;
+        pageSize?: number;
+        sort?: string;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<TableListType, any>({
+        path: `/api/v1/db/meta/projects/${projectId}/storages`,
+        method: 'GET',
+        query: query,
         ...params,
       }),
 

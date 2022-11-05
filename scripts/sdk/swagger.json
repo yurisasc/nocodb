@@ -1335,6 +1335,270 @@
         "description": ""
       }
     },
+    "/api/v1/db/meta/projects/{projectId}/storages/{storageId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "storageId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "project-storage-read",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Storage"
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "id": "string",
+                      "fk_project_id": "string",
+                      "fk_base_id": "string",
+                      "title": "string",
+                      "alias": "string",
+                      "type": "string",
+                      "enabled": "string",
+                      "parent_id": "string",
+                      "show_as": "string",
+                      "tags": "string",
+                      "pinned": true,
+                      "deleted": true,
+                      "order": 0,
+                      "column": [
+                        {
+                          "id": "string",
+                          "base_id": "string",
+                          "fk_model_id": "string",
+                          "title": "string",
+                          "alias": "string",
+                          "ui_data_type": "string",
+                          "data_type": "string",
+                          "numeric_precision": "string",
+                          "numeric_scale": "string",
+                          "character_maximum_length": "string",
+                          "column_ordinal_position": "string",
+                          "primary_key": "string",
+                          "primary_value": "string",
+                          "rqd": "string",
+                          "un": "string",
+                          "column_type": "string",
+                          "auto_increment": "string",
+                          "unique": "string",
+                          "column_default": "string",
+                          "column_comment": "string",
+                          "character_set_name": "string",
+                          "data_type_x": "string",
+                          "data_type_x_precision": "string",
+                          "data_type_x_scale": "string",
+                          "auto_update_timestamp": true,
+                          "deleted": true,
+                          "visible": true,
+                          "order": 0,
+                          "colOptions": {
+                            "id": "string",
+                            "type": "string",
+                            "virtual": true,
+                            "fk_column_id": "string",
+                            "fk_child_column_id": "string",
+                            "fk_parent_column_id": "string",
+                            "fk_mm_model_id": "string",
+                            "fk_mm_child_column_id": "string",
+                            "fk_mm_parent_column_id": "string",
+                            "ur": "string",
+                            "dr": "string",
+                            "fk_index_name": "string",
+                            "deleted": "string",
+                            "order": "string"
+                          }
+                        }
+                      ],
+                      "filters": [
+                        {
+                          "id": "string",
+                          "fk_model_id": "string",
+                          "fk_column_id": "string",
+                          "logical_op": "string",
+                          "comparison_op": "string",
+                          "value": "string",
+                          "is_group": true,
+                          "children": [
+                            {}
+                          ]
+                        }
+                      ],
+                      "sort": [
+                        {
+                          "id": "string",
+                          "fk_model_id": "string",
+                          "fk_column_id": "string",
+                          "direction": "string",
+                          "order": 0
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Project"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "xc-auth",
+            "description": "Auth token"
+          }
+        ],
+        "description": "Read a Storage record under a Project"
+      },
+      "patch": {
+        "summary": "",
+        "operationId": "project-storage-update",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Project"
+        ],
+        "description": "Update a Storage record under a Project"
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "project-storage-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Delete a Storage record under a Project",
+        "tags": [
+          "Project"
+        ]
+      }
+    },
+    "/api/v1/db/meta/projects/{projectId}/storages": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "project-storage-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Storage"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Storage"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Project"
+        ],
+        "description": "Create a storage under a Project"
+      },
+      "get": {
+        "summary": "",
+        "operationId": "project-storage-list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TableList"
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "xc-auth"
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "page"
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "pageSize"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "sort"
+          }
+        ],
+        "tags": [
+          "Project"
+        ],
+        "description": "List of storages under a Project"
+      }
+    },
     "/api/v1/db/meta/tables/{tableId}/reorder": {
       "parameters": [
         {
@@ -7267,6 +7531,32 @@
         "required": [
           "filters"
         ]
+      },
+      "Storage": {
+        "title": "Storage",
+        "type": "object",
+        "examples": [],
+        "description": "Model for Storage Manager",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fk_project_id": {
+            "type": "string"
+          },
+          "fk_base_id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "meta": {
+            "type": [
+              "string",
+              "object"
+            ]
+          }
+        }
       },
       "Sort": {
         "title": "Sort",
