@@ -11,8 +11,8 @@ import { extractProps } from '../meta/helpers/extractProps';
 
 export default class Storage implements StorageType {
   id: string;
-  fk_base_id: string;
-  fk_project_id: string;
+  base_id: string;
+  project_id: string;
   source: string;
   meta?: string;
 
@@ -28,8 +28,8 @@ export default class Storage implements StorageType {
     ncMeta = Noco.ncMeta
   ): Promise<Storage> {
     const insertObj = {
-      fk_base_id: storageBody.fk_base_id,
-      fk_project_id: storageBody.fk_project_id,
+      base_id: storageBody.base_id,
+      project_id: storageBody.project_id,
       source: storageBody.source,
       meta: storageBody.meta,
     };
@@ -42,7 +42,7 @@ export default class Storage implements StorageType {
 
     await NocoCache.appendToList(
       CacheScope.STORAGE,
-      [insertObj.fk_project_id],
+      [insertObj.project_id],
       `${CacheScope.STORAGE}:${storageId}`
     );
     return this.get(storageId, ncMeta);
@@ -56,7 +56,7 @@ export default class Storage implements StorageType {
     let storageList = await NocoCache.getList(CacheScope.STORAGE, [projectId]);
     if (!storageList.length) {
       storageList = await ncMeta.metaList2(null, null, MetaTable.STORAGES, {
-        condition: { fk_project_id: projectId },
+        condition: { project_id: projectId },
       });
       await NocoCache.setList(CacheScope.STORAGE, [projectId], storageList);
     }
