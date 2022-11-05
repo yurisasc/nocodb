@@ -14,7 +14,7 @@ export default class Storage implements StorageType {
     Object.assign(this, data);
   }
 
-  public static async createStorage(
+  public static async insert(
     storageBody: StorageType & {
       created_at?;
       updated_at?;
