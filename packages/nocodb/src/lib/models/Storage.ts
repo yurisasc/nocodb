@@ -10,6 +10,12 @@ import { StorageType } from 'nocodb-sdk';
 import { extractProps } from '../meta/helpers/extractProps';
 
 export default class Storage implements StorageType {
+  id: string;
+  fk_base_id: string;
+  fk_project_id: string;
+  source: string;
+  meta?: string;
+
   constructor(data: Partial<Storage>) {
     Object.assign(this, data);
   }
