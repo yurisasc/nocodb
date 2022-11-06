@@ -1,3 +1,4 @@
+import path from 'path';
 import { ColumnType, UITypes } from 'nocodb-sdk';
 import Noco from '../Noco';
 import { NcUpgraderCtx } from './NcUpgrader';
@@ -66,16 +67,26 @@ async function updateAttachement(
     const attachmentObjs = JSON.parse(row[columnName]);
     const updatedAttachmentObjs = await Promise.all(
       attachmentObjs.map(async (attachmentObj) => {
+        const storageSource = getStorageSource(attachmentObj);
+        const directory = getStorageDirectory(storageSource, attachmentObj);
+        const newAttachmentObj = {
+          ...attachmentObj,
+          directory,
+          level: directory.split('/').length,
+        };
         const storage = await Storage.insert(
           {
             base_id: base.id,
             project_id: projectId,
-            source: getStorageSource(attachmentObj),
-            meta: JSON.stringify(attachmentObj),
+            source: storageSource,
+            meta: JSON.stringify(newAttachmentObj),
           },
           ncMeta
         );
-        return { storageId: storage.id, ...attachmentObj };
+        return {
+          storageId: storage.id,
+          ...newAttachmentObj,
+        };
       })
     );
     const where = {};
@@ -89,6 +100,7 @@ async function updateAttachement(
 }
 
 // TODO(storage): revise the logic
+// TODO(storage): attachmentObj type
 function getStorageSource(attachmentObj) {
   const url = attachmentObj?.url;
   if (url.includes('s3')) {
@@ -97,4 +109,16 @@ function getStorageSource(attachmentObj) {
     return 'Backblaze';
   }
   return 'Local';
+}
+
+// TODO(storage): attachmentObj type
+function getStorageDirectory(storageSource: string, attachementObj) {
+  const url = attachementObj.url;
+  if (storageSource === 'Local') {
+    const searchTerm = '/download/';
+    const offset = searchTerm.length;
+    return path.dirname(url.substr(url.indexOf(searchTerm) + offset));
+  }
+  // TODO:
+  return '';
 }
