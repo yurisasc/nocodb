@@ -1558,11 +1558,6 @@
       "get": {
         "summary": "",
         "operationId": "project-storage-list",
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/TableList"
-          }
-        },
         "parameters": [
           {
             "schema": {
@@ -1596,7 +1591,31 @@
         "tags": [
           "Project"
         ],
-        "description": "List of storages under a Project"
+        "description": "List of storages under a Project",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Storage"
+                      }
+                    },
+                    "pageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/db/meta/tables/{tableId}/reorder": {
