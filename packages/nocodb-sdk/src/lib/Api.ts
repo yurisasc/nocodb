@@ -1605,13 +1605,17 @@ export class Api<
       }),
 
     /**
-     * @description List of storages under a Project
-     *
-     * @tags Project
-     * @name StorageList
-     * @request GET:/api/v1/db/meta/projects/{projectId}/storages
-     * @response `200` `TableListType`
-     */
+ * @description List of storages under a Project
+ * 
+ * @tags Project
+ * @name StorageList
+ * @request GET:/api/v1/db/meta/projects/{projectId}/storages
+ * @response `200` `{
+  list?: (StorageType)[],
+  pageInfo?: PaginatedType,
+
+}` OK
+ */
     storageList: (
       projectId: string,
       query?: {
@@ -1621,10 +1625,17 @@ export class Api<
       },
       params: RequestParams = {}
     ) =>
-      this.request<TableListType, any>({
+      this.request<
+        {
+          list?: StorageType[];
+          pageInfo?: PaginatedType;
+        },
+        any
+      >({
         path: `/api/v1/db/meta/projects/${projectId}/storages`,
         method: 'GET',
         query: query,
+        format: 'json',
         ...params,
       }),
 
