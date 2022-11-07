@@ -9,6 +9,12 @@ const up = async (knex: Knex) => {
     table.string('project_id', 128);
     table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
     table.string('source');
+    table.string('title');
+    table.text('description');
+    table.string('directory');
+    table.string('url');
+    table.string('mimetype');
+    table.integer('size');
     table.text('meta');
     table.timestamps();
   });

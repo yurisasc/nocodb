@@ -69,23 +69,24 @@ async function updateAttachement(
       attachmentObjs.map(async (attachmentObj) => {
         const storageSource = getStorageSource(attachmentObj);
         const directory = getStorageDirectory(storageSource, attachmentObj);
-        const newAttachmentObj = {
-          ...attachmentObj,
-          directory,
-          level: directory.split('/').length,
-        };
         const storage = await Storage.insert(
           {
             base_id: base.id,
             project_id: projectId,
             source: storageSource,
-            meta: JSON.stringify(newAttachmentObj),
+            title: attachmentObj.title,
+            description: '',
+            directory,
+            url: attachmentObj.url,
+            mimetype: attachmentObj.mimetype,
+            size: attachmentObj.size,
+            meta: null,
           },
           ncMeta
         );
         return {
           storageId: storage.id,
-          ...newAttachmentObj,
+          ...attachmentObj,
         };
       })
     );

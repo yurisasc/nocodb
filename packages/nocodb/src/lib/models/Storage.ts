@@ -14,7 +14,13 @@ export default class Storage implements StorageType {
   base_id: string;
   project_id: string;
   source: string;
-  meta?: string;
+  title: string;
+  description: string;
+  directory: string;
+  url: string;
+  mimetype: string;
+  size: number;
+  meta: string;
 
   constructor(data: Partial<Storage>) {
     Object.assign(this, data);
@@ -31,6 +37,12 @@ export default class Storage implements StorageType {
       base_id: storageBody.base_id,
       project_id: storageBody.project_id,
       source: storageBody.source,
+      title: storageBody.title,
+      description: storageBody.description,
+      directory: storageBody.directory,
+      url: storageBody.url,
+      mimetype: storageBody.mimetype,
+      size: storageBody.size,
       meta: storageBody.meta,
     };
     const { id: storageId } = await ncMeta.metaInsert2(
@@ -66,7 +78,16 @@ export default class Storage implements StorageType {
   public static async update(storageId, storage, ncMeta = Noco.ncMeta) {
     // get existing cache
     const key = `${CacheScope.STORAGE}:${storageId}`;
-    const updateObj = extractProps(storage, ['source', 'meta']);
+    const updateObj = extractProps(storage, [
+      'source',
+      'title',
+      'description',
+      'directory',
+      'url',
+      'mimetype',
+      'size',
+      'meta',
+    ]);
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
       o = { ...o, ...updateObj };
