@@ -1628,6 +1628,7 @@ export class Api<
         page?: number;
         pageSize?: number;
         sort?: string;
+        directory?: string;
       },
       params: RequestParams = {}
     ) =>
