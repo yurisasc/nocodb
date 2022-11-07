@@ -49,7 +49,7 @@ export default class Storage implements StorageType {
   }
 
   public static async list(
-    { projectId }: { projectId: string },
+    projectId: string,
     ncMeta = Noco.ncMeta
   ): Promise<Storage[]> {
     if (!projectId) return null;
