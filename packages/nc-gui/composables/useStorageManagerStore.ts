@@ -108,6 +108,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
   }
 
   return {
+    storages,
     directoryTree,
     directoryTreeSelectedKeys,
     directoryTreeExpandedKeys,
