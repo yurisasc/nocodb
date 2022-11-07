@@ -1,5 +1,6 @@
 import type { TreeProps } from 'ant-design-vue'
 import { useInjectionState } from '#imports'
+import { StorageType } from 'nocodb-sdk'
 
 const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionState(() => {
   // const { t } = useI18n()
@@ -14,6 +15,8 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
   const directoryTreeSelectedKeys = ref<string[]>([])
   // directory treeNodes
   const directoryTree = ref<TreeProps['treeData']>([])
+  // the storages data displayed in storage manager explorer
+  const storages = ref<StorageType[]>([])
   // the selected directory path
   const directory = computed(() => directoryTreeSelectedKeys.value?.[0])
   // the breadcrumb items of the selected directory path
@@ -52,9 +55,9 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     if (!project.value.id) {
       return
     }
-    const storages = (await api.project.storageList(project.value.id)).list!
+    const storageList = (await api.project.storageList(project.value.id)).list!
     const directoryTreeMap: Record<string, any> = {}
-    for (const storage of storages) {
+    for (const storage of storageList) {
       if (!(storage.source! in directoryTreeMap)) directoryTreeMap[storage.source!] = []
       directoryTreeMap[storage.source!].push(storage)
     }
@@ -88,6 +91,10 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     loadDirectoryTreeExpandedKeys()
   }
 
+  async function loadStorageByDirectory(directory: string) {
+    storages.value = (await api.project.storageList(project.value.id, { directory })).list!
+  }
+
   function loadDirectoryTreeExpandedKeys() {
     // expand the first level parent treeNodes
     directoryTreeExpandedKeys.value = directoryTree.value?.reduce((acc: string[], obj: TreeProps['treeData']) => {
@@ -108,6 +115,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     breadcrumbItems,
     loadDirectoryTree,
     loadDirectoryTreeExpandedKeys,
+    loadStorageByDirectory,
     updateSelectedKeys,
   }
 }, 'storage-manager-store')
