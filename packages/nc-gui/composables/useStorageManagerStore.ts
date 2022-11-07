@@ -17,7 +17,21 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
   // the selected directory path
   const directory = computed(() => directoryTreeSelectedKeys.value?.[0])
   // the breadcrumb items of the selected directory path
-  const breadcrumbItems = computed(() => directory.value?.split('/'))
+  const breadcrumbItems = computed(() => {
+    const segments = directory.value?.split('/')
+    const res: Record<string, any>[] = []
+    if (!segments?.length) return res
+    let prevDirectory = ''
+    for (let i = 0; i < segments.length; i++) {
+      const currentDirectory = prevDirectory ? `${prevDirectory}/${segments[i]}` : segments[i]
+      res.push({
+        title: segments[i],
+        key: currentDirectory,
+      })
+      prevDirectory = currentDirectory
+    }
+    return res
+  })
 
   // TODO(storage): types
   function getTreeNodeChildren(treeNodes: any, parentDirectory: string, treeNodeAdj: any): any {
@@ -86,6 +100,10 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     }, [])
   }
 
+  function updateSelectedKeys(keys: string) {
+    directoryTreeSelectedKeys.value = [keys]
+  }
+
   return {
     directoryTree,
     directoryTreeSelectedKeys,
@@ -94,6 +112,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     breadcrumbItems,
     loadDirectoryTree,
     loadDirectoryTreeExpandedKeys,
+    updateSelectedKeys,
   }
 }, 'storage-manager-store')
 
