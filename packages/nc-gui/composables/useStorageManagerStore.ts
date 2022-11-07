@@ -55,12 +55,8 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     const storages = (await api.project.storageList(project.value.id)).list!
     const directoryTreeMap: Record<string, any> = {}
     for (const storage of storages) {
-      if (!(storage.source! in directoryTreeMap)) {
-        directoryTreeMap[storage.source!] = []
-      }
-      if (storage.meta) {
-        directoryTreeMap[storage.source!].push(typeof storage.meta === 'string' ? JSON.parse(storage.meta) : storage.meta)
-      }
+      if (!(storage.source! in directoryTreeMap)) directoryTreeMap[storage.source!] = []
+      directoryTreeMap[storage.source!].push(storage)
     }
 
     for (const key of Object.keys(directoryTreeMap)) {
