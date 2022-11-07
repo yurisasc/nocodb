@@ -28,7 +28,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
       children.push({
         title: treeNode,
         key: currentDirectory,
-        children: getTreeNodeChildren(treeNodeAdj[treeNode], currentDirectory, treeNodeAdj),
+        children: getTreeNodeChildren(treeNodeAdj[currentDirectory], currentDirectory, treeNodeAdj),
       })
     }
     return children
@@ -39,9 +39,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
       return
     }
     const storages = (await api.project.storageList(project.value.id)).list!
-
     const directoryTreeMap: Record<string, any> = {}
-
     for (const storage of storages) {
       if (!(storage.source! in directoryTreeMap)) {
         directoryTreeMap[storage.source!] = []
@@ -53,20 +51,21 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
 
     for (const key of Object.keys(directoryTreeMap)) {
       const treeNodeAdj: Record<string, Set<string>> = {}
+      treeNodeAdj[key] = new Set<string>()
       for (const treeNode of directoryTreeMap[key]) {
         const directory = treeNode.directory
         const directorySegments = directory.split('/')
-        treeNodeAdj[key] = new Set<string>()
+        treeNodeAdj[key].add(directorySegments[0])
+        let parentDirectory = key
         for (let i = 0; i < directorySegments.length; i++) {
-          if (i === 0) {
-            treeNodeAdj[key].add(directorySegments[i])
-          }
-          if (i + 1 < directorySegments.length && directorySegments[i + 1] !== '') {
-            if (!treeNodeAdj[directorySegments[i]]) {
-              treeNodeAdj[directorySegments[i]] = new Set<string>()
+          const currentDirectory = `${parentDirectory}/${directorySegments[i]}`
+          if (directorySegments[i + 1]) {
+            if (!treeNodeAdj[currentDirectory]) {
+              treeNodeAdj[currentDirectory] = new Set<string>()
             }
-            treeNodeAdj[directorySegments[i]].add(directorySegments[i + 1])
+            treeNodeAdj[currentDirectory].add(directorySegments[i + 1])
           }
+          parentDirectory = currentDirectory
         }
       }
 
