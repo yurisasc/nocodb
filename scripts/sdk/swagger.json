@@ -7569,6 +7569,24 @@
           "source": {
             "type": "string"
           },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "directory": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          },
           "meta": {
             "type": [
               "string",

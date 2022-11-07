@@ -212,6 +212,12 @@ export interface StorageType {
   project_id?: string;
   base_id?: string;
   source?: string;
+  title?: string;
+  description?: string;
+  directory?: string;
+  url?: string;
+  mimetype?: string;
+  size?: number;
   meta?: string | object;
 }
 
