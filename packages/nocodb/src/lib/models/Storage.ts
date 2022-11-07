@@ -62,15 +62,24 @@ export default class Storage implements StorageType {
 
   public static async list(
     projectId: string,
+    param?: any,
     ncMeta = Noco.ncMeta
   ): Promise<Storage[]> {
     if (!projectId) return null;
-    let storageList = await NocoCache.getList(CacheScope.STORAGE, [projectId]);
+    let storageList =
+      param.directory === null
+        ? await NocoCache.getList(CacheScope.STORAGE, [projectId])
+        : [];
     if (!storageList.length) {
       storageList = await ncMeta.metaList2(null, null, MetaTable.STORAGES, {
-        condition: { project_id: projectId },
+        condition: {
+          project_id: projectId,
+          ...(param.directory && { directory: param.directory }),
+        },
       });
-      await NocoCache.setList(CacheScope.STORAGE, [projectId], storageList);
+      if (param.directory === null) {
+        await NocoCache.setList(CacheScope.STORAGE, [projectId], storageList);
+      }
     }
     return storageList.map((s) => new Storage(s));
   }

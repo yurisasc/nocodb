@@ -9,7 +9,9 @@ export async function storageList(
   req: Request<any, StorageType>,
   res: Response
 ) {
-  res.json(new PagedResponseImpl(await Storage.list(req.params.projectId)));
+  res.json(
+    new PagedResponseImpl(await Storage.list(req.params.projectId, req.query))
+  );
 }
 
 export async function storageCreate(
