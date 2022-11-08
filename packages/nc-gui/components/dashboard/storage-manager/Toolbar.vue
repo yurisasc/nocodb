@@ -32,7 +32,6 @@
       <div class="flex items-center gap-1">
         <MdiRefresh />
         <span class="text-capitalize !text-sm font-weight-normal">{{ $t('activity.storageManager.refresh') }}</span>
-        <MdiMenuDown class="text-grey" />
       </div>
     </a-button>
 
