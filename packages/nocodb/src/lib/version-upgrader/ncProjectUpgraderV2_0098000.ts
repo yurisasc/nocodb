@@ -74,7 +74,7 @@ async function updateAttachement(
             base_id: base.id,
             project_id: projectId,
             source: storageSource,
-            title: attachmentObj.title,
+            title: attachmentObj.url?.split('/')?.at(-1),
             description: '',
             directory,
             url: attachmentObj.url,
