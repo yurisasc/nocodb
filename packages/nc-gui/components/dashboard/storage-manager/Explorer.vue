@@ -30,10 +30,7 @@ const folders = computed(() => dfs(directoryTree.value[0]))
 
 <template>
   <div v-show="currentDirectory">
-    <div
-        class="nc-storage-toolbar w-full py-1 flex gap-2 items-center h-[var(--toolbar-height)] px-2 border-b overflow-x-hidden"
-        style="z-index: 7"
-    >
+    <div class="nc-storage-toolbar w-full py-1 flex gap-2 items-center h-[var(--toolbar-height)] px-2 border-b overflow-x-hidden">
       <LazyDashboardStorageManagerBreadcrumb />
 
       <div class="flex-1" />
@@ -43,17 +40,12 @@ const folders = computed(() => dfs(directoryTree.value[0]))
 
     <LazyDashboardStorageManagerToolbar />
 
-    <div class="flex flex-row">
-      <div
-          v-for="(folder, idx) of folders"
-          :key="idx"
-          class="w-60px align-center cursor-pointer"
-          @click="updateSelectedKeys(folder.key)"
-      >
+    <div class="flex flex-row select-none text-center cursor-pointer">
+      <div v-for="(folder, idx) of folders" :key="idx" class="w-60px" @dblclick.prevent="updateSelectedKeys(folder.key)">
         <MdiFolderOpenOutline class="text-4xl" />
-        <div class="align-center">{{ folder.title }}</div>
+        <div class="">{{ folder.title }}</div>
       </div>
-      <div v-for="(file, idx) of storages" :key="idx" class="w-60px align-center cursor-pointer">
+      <div v-for="(file, idx) of storages" :key="idx" class="w-60px">
         <MdiFileDocumentOutline class="text-4xl" />
         <div class="align-center">{{ file.title }}</div>
       </div>
