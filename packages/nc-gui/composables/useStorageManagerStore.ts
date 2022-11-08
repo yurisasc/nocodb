@@ -92,7 +92,8 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
   }
 
   async function loadStorageByDirectory(directory: string) {
-    storages.value = (await api.project.storageList(project.value.id, { directory })).list!
+    if (!directory) storages.value = []
+    else storages.value = (await api.project.storageList(project.value.id, { directory })).list!
   }
 
   function loadDirectoryTreeExpandedKeys() {
