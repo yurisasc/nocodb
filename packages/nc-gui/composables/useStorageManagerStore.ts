@@ -48,7 +48,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
         children: getTreeNodeChildren(treeNodeAdj[currentDirectory], currentDirectory, treeNodeAdj),
       })
     }
-    return children
+    return children.sort((x: any, y: any) => (x.title > y.title ? 1 : -1))
   }
 
   async function loadDirectoryTree() {
@@ -105,6 +105,12 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
 
   function updateSelectedKeys(keys: string) {
     directoryTreeSelectedKeys.value = [keys]
+    const directoryTreeExpandedKeysArr: string[] = []
+    keys.split('/')?.map((key: string) => {
+      if (!directoryTreeExpandedKeysArr.length) directoryTreeExpandedKeysArr.push(key)
+      else directoryTreeExpandedKeysArr.push(directoryTreeExpandedKeysArr.at(-1) + '/' + key)
+    })
+    directoryTreeExpandedKeys.value = directoryTreeExpandedKeysArr
   }
 
   return {
