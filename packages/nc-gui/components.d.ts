@@ -170,6 +170,7 @@ declare module '@vue/runtime-core' {
     MdiFilterOutline: typeof import('~icons/mdi/filter-outline')['default']
     MdiFlag: typeof import('~icons/mdi/flag')['default']
     MdiFolder: typeof import('~icons/mdi/folder')['default']
+    MdiFolderOpenOutline: typeof import('~icons/mdi/folder-open-outline')['default']
     MdiFolderOutline: typeof import('~icons/mdi/folder-outline')['default']
     MdiFunction: typeof import('~icons/mdi/function')['default']
     MdiGestureDoubleTap: typeof import('~icons/mdi/gesture-double-tap')['default']
