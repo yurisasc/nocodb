@@ -43,9 +43,9 @@ useProvideStorageManagerStore()
       </a-button>
     </div>
 
-    <a-layout class="mt-3 h-[75vh] overflow-y-auto flex">
+    <a-layout class="mt-3 h-full overflow-y-auto flex">
       <!-- Directory Tree -->
-      <a-layout-sider>
+      <a-layout-sider class="h-full overflow-auto">
         <LazyDashboardStorageManagerDirectoryTree />
       </a-layout-sider>
 
