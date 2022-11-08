@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useStorageManagerStoreOrThrow, watch } from '#imports'
+import { isImage, useStorageManagerStoreOrThrow, watch } from '#imports'
 const { storages, directoryTree, breadcrumbItems, loadStorageByDirectory, updateSelectedKeys } = useStorageManagerStoreOrThrow()
 
 watch(breadcrumbItems, async (v: Record<string, any>) => {
@@ -40,15 +40,49 @@ const folders = computed(() => dfs(directoryTree.value[0]))
 
     <LazyDashboardStorageManagerToolbar />
 
-    <div class="flex flex-row select-none text-center cursor-pointer">
-      <div v-for="(folder, idx) of folders" :key="idx" class="w-60px" @dblclick.prevent="updateSelectedKeys(folder.key)">
-        <MdiFolderOpenOutline class="text-4xl" />
-        <div class="">{{ folder.title }}</div>
-      </div>
-      <div v-for="(file, idx) of storages" :key="idx" class="w-60px">
-        <MdiFileDocumentOutline class="text-4xl" />
-        <div class="align-center">{{ file.title }}</div>
-      </div>
+    <div class="flex flex-row select-none text-center cursor-pointer gap-4">
+      <!-- Folders -->
+      <a-card
+        v-for="(folder, idx) of folders"
+        :key="idx"
+        hoverable
+        class="w-[150px]"
+        :body-style="{ padding: '20px 5px' }"
+        @dblclick="updateSelectedKeys(folder.key)"
+      >
+        <template #cover>
+          <div class="pt-[15px]">
+            <MdiFolderOpenOutline class="text-4xl" />
+          </div>
+        </template>
+        <a-card-meta>
+          <template #title>
+            <span class="text-sm">{{ folder.title }}</span>
+          </template>
+        </a-card-meta>
+      </a-card>
+
+      <!-- Files -->
+      <a-card v-for="(file, idx) of storages" :key="idx" hoverable class="w-[150px]" :body-style="{ padding: '20px 5px' }">
+        <template #cover>
+          <div class="nc-storage flex items-center justify-center">
+            <LazyNuxtImg
+              v-if="isImage(file.title, file.mimetype) && file.url"
+              quality="75"
+              placeholder
+              fit="cover"
+              :src="file.url"
+              class="max-w-full max-h-full p-[20px]"
+            />
+            <MdiFileDocumentOutline v-else class="text-4xl" />
+          </div>
+        </template>
+        <a-card-meta>
+          <template #title>
+            <span class="text-sm">{{ file.title }}</span>
+          </template>
+        </a-card-meta>
+      </a-card>
     </div>
   </div>
 </template>
