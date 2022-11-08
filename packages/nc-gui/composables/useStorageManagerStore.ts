@@ -1,6 +1,6 @@
 import type { TreeProps } from 'ant-design-vue'
+import type { StorageType } from 'nocodb-sdk'
 import { useInjectionState } from '#imports'
-import { StorageType } from 'nocodb-sdk'
 
 const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionState(() => {
   // const { t } = useI18n()
@@ -109,7 +109,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     const directoryTreeExpandedKeysArr: string[] = []
     keys.split('/')?.map((key: string) => {
       if (!directoryTreeExpandedKeysArr.length) directoryTreeExpandedKeysArr.push(key)
-      else directoryTreeExpandedKeysArr.push(directoryTreeExpandedKeysArr.at(-1) + '/' + key)
+      else directoryTreeExpandedKeysArr.push(`${directoryTreeExpandedKeysArr.at(-1)}/${key}`)
     })
     directoryTreeExpandedKeys.value = directoryTreeExpandedKeysArr
   }

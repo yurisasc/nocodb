@@ -12,8 +12,8 @@ function search() {
       <MdiMagnify class="text-grey" />
     </div>
     <a-input
-      size="small"
       v-model:value="searchQuery"
+      size="small"
       class="max-w-[200px]"
       placeholder="Search"
       :bordered="false"
