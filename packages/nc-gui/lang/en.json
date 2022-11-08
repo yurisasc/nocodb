@@ -429,6 +429,14 @@
       "stackedBy": "Stacked By",
       "chooseGroupingField": "Choose a Grouping Field",
       "addOrEditStack": "Add / Edit Stack"
+    },
+    "storageManager": {
+      "newFolder": "New Folder",
+      "uploadFile": "Upload File",
+      "sortBy": "Sort By",
+      "refresh": "Refresh",
+      "download": "Download",
+      "delete": "Delete"
     }
   },
   "tooltip": {
