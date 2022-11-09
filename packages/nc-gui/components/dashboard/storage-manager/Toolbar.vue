@@ -1,4 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useStorageManagerStoreOrThrow } from '#imports'
+const { selectedStorageObjects } = useStorageManagerStoreOrThrow()
+</script>
 
 <template>
   <div class="my-4">
@@ -36,7 +39,7 @@
     </a-button>
 
     <!-- Download (when selected) -->
-    <a-button v-e="['c:storage:download']" class="nc-download-menu-btn nc-toolbar-btn">
+    <a-button v-if="selectedStorageObjects.length" v-e="['c:storage:download']" class="nc-download-menu-btn nc-toolbar-btn">
       <div class="flex items-center gap-1">
         <MdiDownload />
         <span class="text-capitalize !text-sm font-weight-normal">{{ $t('activity.storageManager.download') }}</span>
@@ -44,7 +47,7 @@
     </a-button>
 
     <!-- Delete (when selected) -->
-    <a-button v-e="['c:storage:delete']" class="nc-delete-menu-btn nc-toolbar-btn">
+    <a-button v-if="selectedStorageObjects.length" v-e="['c:storage:delete']" class="nc-delete-menu-btn nc-toolbar-btn">
       <div class="flex items-center gap-1">
         <MdiDeleteOutline />
         <span class="text-capitalize !text-sm font-weight-normal">{{ $t('activity.storageManager.delete') }}</span>
