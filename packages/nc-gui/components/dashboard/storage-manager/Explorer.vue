@@ -12,20 +12,15 @@ const {
   selectedSidebarObject,
 } = useStorageManagerStoreOrThrow()
 
-watch(breadcrumbItems, async (v: Record<string, any>) => {
-  await loadStorageByDirectory(v?.at(-1)?.key.split('/').slice(1).join('/'))
-})
-
 const currentDirectory = computed(() => breadcrumbItems.value?.at(-1)?.key)
 
 const storageObjRef = ref(null)
 
-onClickOutside(storageObjRef, () => {
-  selectedStorageObjects.value = {}
-})
+// TODO: retrive source idx
+// 0: Local
+const folders = computed(() => dfs(directoryTree.value[0]))
 
-// TODO(storage): types
-function dfs(treeNode: any): any {
+function dfs(treeNode: TreeProps['treeData']): TreeProps['treeData'] {
   if (!treeNode) return []
   if (treeNode.key === currentDirectory.value) return treeNode.children
   if (treeNode.children) {
@@ -53,14 +48,17 @@ function handleFileClick(file: StorageType) {
   selectedStorageObjects.value[file.id] = file
 }
 
-// TODO: retrive source idx
-// 0: Local
-const folders = computed(() => dfs(directoryTree.value[0]))
+onClickOutside(storageObjRef, () => {
+  selectedStorageObjects.value = {}
+})
+
+watch(breadcrumbItems, async (v: Record<string, any>[]) => {
+  await loadStorageByDirectory(v?.at(-1)?.key.split('/').slice(1).join('/'))
+})
 </script>
 
 <template>
   <div v-show="currentDirectory">
-    {{ selectedStorageObjects }}
     <div class="nc-storage-toolbar w-full py-2 flex gap-2 items-center h-[var(--toolbar-height)] px-2 border-b overflow-x-hidden">
       <LazyDashboardStorageManagerBreadcrumb />
 

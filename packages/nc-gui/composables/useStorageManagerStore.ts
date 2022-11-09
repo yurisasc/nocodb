@@ -15,14 +15,14 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
   const directoryTreeSelectedKeys = ref<string[]>([])
   // directory treeNodes
   const directoryTree = ref<TreeProps['treeData']>([])
-  // the storages data displayed in storage manager explorer
+  // the storage data displayed in storage manager explorer
   const storages = ref<StorageType[]>([])
   // the selected directory path
   const directory = computed(() => directoryTreeSelectedKeys.value?.[0])
   // the breadcrumb items of the selected directory path
   const breadcrumbItems = computed(() => {
     const segments = directory.value?.split('/')
-    const res: Record<string, any>[] = []
+    const res: Record<string, { title: string; key: string }>[] = []
     if (!segments?.length) return res
     let prevDirectory = ''
     for (let i = 0; i < segments.length; i++) {
@@ -35,11 +35,17 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     }
     return res
   })
+  // selected storage objects, e.g. folders or files
+  // used to perform bulk actions, e.g. bulk delete
   const selectedStorageObjects = ref<Record<string, StorageType>>({})
+  // selected file object which will be rendered in FileSidebar
   const selectedSidebarObject = ref<StorageType>({})
 
-  // TODO(storage): types
-  function getTreeNodeChildren(treeNodes: any, parentDirectory: string, treeNodeAdj: any): any {
+  function getTreeNodeChildren(
+    treeNodes: Set<string>,
+    parentDirectory: string,
+    treeNodeAdj: Record<string, Set<string>>,
+  ): TreeProps['treeData'] {
     if (!treeNodes?.size) return []
     const children = []
     for (const treeNode of treeNodes) {
@@ -50,7 +56,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
         children: getTreeNodeChildren(treeNodeAdj[currentDirectory], currentDirectory, treeNodeAdj),
       })
     }
-    return children.sort((x: any, y: any) => (x.title > y.title ? 1 : -1))
+    return children.sort((x: TreeProps['treeData'], y: TreeProps['treeData']) => (x.title > y.title ? 1 : -1))
   }
 
   async function loadDirectoryTree() {
@@ -58,7 +64,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
       return
     }
     const storageList = (await api.project.storageList(project.value.id)).list!
-    const directoryTreeMap: Record<string, any> = {}
+    const directoryTreeMap: Record<string, StorageType[]> = {}
     for (const storage of storageList) {
       if (!(storage.source! in directoryTreeMap)) directoryTreeMap[storage.source!] = []
       directoryTreeMap[storage.source!].push(storage)
@@ -69,7 +75,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
       treeNodeAdj[key] = new Set<string>()
       for (const treeNode of directoryTreeMap[key]) {
         const directory = treeNode.directory
-        const directorySegments = directory.split('/')
+        const directorySegments = directory!.split('/')
         treeNodeAdj[key].add(directorySegments[0])
         let parentDirectory = key
         for (let i = 0; i < directorySegments.length; i++) {

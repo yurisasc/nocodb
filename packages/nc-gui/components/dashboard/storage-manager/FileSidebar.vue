@@ -8,7 +8,7 @@ const { t } = useI18n()
 const fileSidebarRef = ref()
 
 const fileSidebarData = computed(() => {
-  const res: Record<string, any> = []
+  const res: Record<string, any>[] = []
   if (selectedSidebarObject.value && Object.keys(selectedSidebarObject.value).length) {
     for (const [k, v] of Object.entries(selectedSidebarObject.value)) {
       if (['source', 'url', 'mimetype', 'size', 'created_at', 'updated_at'].includes(k)) {
