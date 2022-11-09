@@ -35,6 +35,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     }
     return res
   })
+  const selectedStorageObjects = ref<StorageType[]>([])
 
   // TODO(storage): types
   function getTreeNodeChildren(treeNodes: any, parentDirectory: string, treeNodeAdj: any): any {
@@ -107,7 +108,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
   function updateSelectedKeys(keys: string) {
     directoryTreeSelectedKeys.value = [keys]
     const directoryTreeExpandedKeysArr: string[] = []
-    keys.split('/')?.map((key: string) => {
+    keys.split('/')?.forEach((key: string) => {
       if (!directoryTreeExpandedKeysArr.length) directoryTreeExpandedKeysArr.push(key)
       else directoryTreeExpandedKeysArr.push(`${directoryTreeExpandedKeysArr.at(-1)}/${key}`)
     })
@@ -116,6 +117,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
 
   return {
     storages,
+    selectedStorageObjects,
     directoryTree,
     directoryTreeSelectedKeys,
     directoryTreeExpandedKeys,
