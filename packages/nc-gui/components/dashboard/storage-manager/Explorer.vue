@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { isImage, useStorageManagerStoreOrThrow, watch } from '#imports'
-const { storages, directoryTree, breadcrumbItems, loadStorageByDirectory, updateSelectedKeys } = useStorageManagerStoreOrThrow()
+const { storages, directoryTree, breadcrumbItems, loadStorageByDirectory, updateSelectedKeys, selectedStorageObjects } =
+  useStorageManagerStoreOrThrow()
 
 watch(breadcrumbItems, async (v: Record<string, any>) => {
   await loadStorageByDirectory(v?.at(-1)?.key.split('/').slice(1).join('/'))
@@ -30,7 +31,7 @@ const folders = computed(() => dfs(directoryTree.value[0]))
 
 <template>
   <div v-show="currentDirectory">
-    <div class="nc-storage-toolbar w-full py-1 flex gap-2 items-center h-[var(--toolbar-height)] px-2 border-b overflow-x-hidden">
+    <div class="nc-storage-toolbar w-full py-2 flex gap-2 items-center h-[var(--toolbar-height)] px-2 border-b overflow-x-hidden">
       <LazyDashboardStorageManagerBreadcrumb />
 
       <div class="flex-1" />
@@ -38,9 +39,15 @@ const folders = computed(() => dfs(directoryTree.value[0]))
       <LazyDashboardStorageManagerSearch />
     </div>
 
-    <LazyDashboardStorageManagerToolbar />
+    <div class="nc-storage-window w-full py-1 flex gap-2 items-center px-2 overflow-x-hidden">
+      <LazyDashboardStorageManagerToolbar />
 
-    <div class="flex flex-row select-none text-center cursor-pointer gap-4">
+      <div class="flex-1" />
+
+      <LazyDashboardStorageManagerFileSidebar />
+    </div>
+
+    <div class="flex select-none text-center cursor-pointer gap-4">
       <!-- Folders -->
       <a-card
         v-for="(folder, idx) of folders"
@@ -73,6 +80,7 @@ const folders = computed(() => dfs(directoryTree.value[0]))
               fit="cover"
               :src="file.url"
               class="max-w-full max-h-full p-[20px]"
+              @click="selectedStorageObjects.push(file)"
             />
             <MdiFileDocumentOutline v-else class="text-4xl" />
           </div>
