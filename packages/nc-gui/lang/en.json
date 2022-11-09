@@ -198,7 +198,8 @@
     "quickImportFrom": "Quick Import From",
     "quickImport": "Quick Import",
     "advancedSettings": "Advanced Settings",
-    "codeSnippet": "Code Snippet"
+    "codeSnippet": "Code Snippet",
+    "fileDetails": "File Details"
   },
   "labels": {
     "notifyVia": "Notify Via",
