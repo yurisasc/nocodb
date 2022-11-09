@@ -1,13 +1,28 @@
 <script setup lang="ts">
-import { isImage, useStorageManagerStoreOrThrow, watch } from '#imports'
-const { storages, directoryTree, breadcrumbItems, loadStorageByDirectory, updateSelectedKeys, selectedStorageObjects } =
-  useStorageManagerStoreOrThrow()
+import type { TreeProps } from 'ant-design-vue'
+import type { StorageType } from 'nocodb-sdk'
+import { isImage, onClickOutside, useStorageManagerStoreOrThrow, watch } from '#imports'
+const {
+  storages,
+  directoryTree,
+  breadcrumbItems,
+  loadStorageByDirectory,
+  updateSelectedKeys,
+  selectedStorageObjects,
+  selectedSidebarObject,
+} = useStorageManagerStoreOrThrow()
 
 watch(breadcrumbItems, async (v: Record<string, any>) => {
   await loadStorageByDirectory(v?.at(-1)?.key.split('/').slice(1).join('/'))
 })
 
 const currentDirectory = computed(() => breadcrumbItems.value?.at(-1)?.key)
+
+const storageObjRef = ref(null)
+
+onClickOutside(storageObjRef, () => {
+  selectedStorageObjects.value = {}
+})
 
 // TODO(storage): types
 function dfs(treeNode: any): any {
@@ -24,6 +39,20 @@ function dfs(treeNode: any): any {
   return []
 }
 
+function handleFolderClick(folderKey: string, folderObj: TreeProps['treeData']) {
+  selectedStorageObjects.value[folderKey] = folderObj
+}
+
+function handleFolderDoubleClick(folderKey: string) {
+  updateSelectedKeys(folderKey)
+  selectedStorageObjects.value = {}
+}
+
+function handleFileClick(file: StorageType) {
+  selectedSidebarObject.value = file
+  selectedStorageObjects.value[file.id] = file
+}
+
 // TODO: retrive source idx
 // 0: Local
 const folders = computed(() => dfs(directoryTree.value[0]))
@@ -31,6 +60,7 @@ const folders = computed(() => dfs(directoryTree.value[0]))
 
 <template>
   <div v-show="currentDirectory">
+    {{ selectedStorageObjects }}
     <div class="nc-storage-toolbar w-full py-2 flex gap-2 items-center h-[var(--toolbar-height)] px-2 border-b overflow-x-hidden">
       <LazyDashboardStorageManagerBreadcrumb />
 
@@ -47,15 +77,17 @@ const folders = computed(() => dfs(directoryTree.value[0]))
       <LazyDashboardStorageManagerFileSidebar />
     </div>
 
-    <div class="flex select-none text-center cursor-pointer gap-4">
+    <div class="flex select-none text-center gap-4">
       <!-- Folders -->
       <a-card
         v-for="(folder, idx) of folders"
+        ref="storageObjRef"
         :key="idx"
         hoverable
-        class="w-[150px]"
+        class="w-[150px] cursor-pointer"
         :body-style="{ padding: '20px 5px' }"
-        @dblclick="updateSelectedKeys(folder.key)"
+        @click="handleFolderClick(folder.key, folder)"
+        @dblclick="handleFolderDoubleClick(folder.key)"
       >
         <template #cover>
           <div class="pt-[15px]">
@@ -70,7 +102,14 @@ const folders = computed(() => dfs(directoryTree.value[0]))
       </a-card>
 
       <!-- Files -->
-      <a-card v-for="(file, idx) of storages" :key="idx" hoverable class="w-[150px]" :body-style="{ padding: '20px 5px' }">
+      <a-card
+        v-for="(file, idx) of storages"
+        :key="idx"
+        hoverable
+        class="w-[150px] cursor-pointer"
+        :body-style="{ padding: '20px 5px' }"
+        @click="handleFileClick(file)"
+      >
         <template #cover>
           <div class="nc-storage flex items-center justify-center">
             <LazyNuxtImg
@@ -80,7 +119,6 @@ const folders = computed(() => dfs(directoryTree.value[0]))
               fit="cover"
               :src="file.url"
               class="max-w-full max-h-full p-[20px]"
-              @click="selectedStorageObjects.push(file)"
             />
             <MdiFileDocumentOutline v-else class="text-4xl" />
           </div>

@@ -35,7 +35,8 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
     }
     return res
   })
-  const selectedStorageObjects = ref<StorageType[]>([])
+  const selectedStorageObjects = ref<Record<string, StorageType>>({})
+  const selectedSidebarObject = ref<StorageType>({})
 
   // TODO(storage): types
   function getTreeNodeChildren(treeNodes: any, parentDirectory: string, treeNodeAdj: any): any {
@@ -118,6 +119,7 @@ const [useProvideStorageManagerStore, useStorageManagerStore] = useInjectionStat
   return {
     storages,
     selectedStorageObjects,
+    selectedSidebarObject,
     directoryTree,
     directoryTreeSelectedKeys,
     directoryTreeExpandedKeys,

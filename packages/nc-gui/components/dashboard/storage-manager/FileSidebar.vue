@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside, useStorageManagerStoreOrThrow } from '#imports'
 
-const { selectedStorageObjects } = useStorageManagerStoreOrThrow()
+const { selectedSidebarObject } = useStorageManagerStoreOrThrow()
 
 const { t } = useI18n()
 
@@ -9,11 +9,11 @@ const fileSidebarRef = ref()
 
 const fileSidebarData = computed(() => {
   const res: Record<string, any> = []
-  if (selectedStorageObjects.value && selectedStorageObjects.value.length === 1) {
-    for (const [k, v] of Object.entries(selectedStorageObjects.value[0])) {
+  if (selectedSidebarObject.value && Object.keys(selectedSidebarObject.value).length) {
+    for (const [k, v] of Object.entries(selectedSidebarObject.value)) {
       if (['source', 'url', 'mimetype', 'size', 'created_at', 'updated_at'].includes(k)) {
         res.push({
-          key: k.split("_")[0],
+          key: k.split('_')[0],
           value: v,
         })
       }
@@ -23,26 +23,26 @@ const fileSidebarData = computed(() => {
 })
 
 onClickOutside(fileSidebarRef, () => {
-  selectedStorageObjects.value = []
+  selectedSidebarObject.value = {}
 })
 </script>
 
 <template>
   <a-drawer
     ref="fileSidebarRef"
-    v-model:visible="selectedStorageObjects.length"
+    v-model:visible="Object.keys(selectedSidebarObject).length"
     placement="right"
     :closable="true"
     :get-container="false"
     :style="{ position: 'absolute' }"
     :mask="false"
     :header-style="{ padding: '13px 24px' }"
-    @keydown.esc="selectedStorageObjects = []"
+    @keydown.esc="selectedSidebarObject = {}"
   >
     <template #title>
       <div class="flex items-center">
-        <MdiAlertCircleOutline class="mr-2"/>
-        {{ t('title.fileDetails')}}
+        <MdiAlertCircleOutline class="mr-2" />
+        {{ t('title.fileDetails') }}
       </div>
     </template>
     <a-list item-layout="horizontal" :data-source="fileSidebarData">
