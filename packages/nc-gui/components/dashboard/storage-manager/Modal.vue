@@ -27,6 +27,7 @@ useProvideStorageManagerStore()
     :footer="null"
     width="max(90vw, 600px)"
     :closable="false"
+    :keyboard="false"
     wrap-class-name="nc-modal-storage"
     @cancel="emits('update:modelValue', false)"
   >
