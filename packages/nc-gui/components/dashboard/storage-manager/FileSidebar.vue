@@ -13,7 +13,7 @@ const fileSidebarData = computed(() => {
     for (const [k, v] of Object.entries(selectedStorageObjects.value[0])) {
       if (['source', 'url', 'mimetype', 'size', 'created_at', 'updated_at'].includes(k)) {
         res.push({
-          key: k,
+          key: k.split("_")[0],
           value: v,
         })
       }
@@ -31,7 +31,6 @@ onClickOutside(fileSidebarRef, () => {
   <a-drawer
     ref="fileSidebarRef"
     v-model:visible="selectedStorageObjects.length"
-    :title="t('title.fileDetails')"
     placement="right"
     :closable="true"
     :get-container="false"
@@ -40,6 +39,12 @@ onClickOutside(fileSidebarRef, () => {
     :header-style="{ padding: '13px 24px' }"
     @keydown.esc="selectedStorageObjects = []"
   >
+    <template #title>
+      <div class="flex items-center">
+        <MdiAlertCircleOutline class="mr-2"/>
+        {{ t('title.fileDetails')}}
+      </div>
+    </template>
     <a-list item-layout="horizontal" :data-source="fileSidebarData">
       <template #renderItem="{ item }">
         <a-list-item>
