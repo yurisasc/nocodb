@@ -1,8 +1,6 @@
-import { expect, Locator } from '@playwright/test';
+import { Locator } from '@playwright/test';
 import { SettingsPage } from '.';
 import BasePage from '../../Base';
-import { writeFileAsync } from 'xlsx';
-import { ToolbarPage } from '../common/Toolbar';
 
 export class TeamsPage extends BasePage {
   private readonly settings: SettingsPage;
@@ -27,6 +25,10 @@ export class TeamsPage extends BasePage {
 
   getSharedBaseSubModal() {
     return this.rootPage.locator(`[data-testid="nc-share-base-sub-modal"]`);
+  }
+
+  async clickInviteTeamBtn() {
+    await this.inviteTeamBtn.click();
   }
 
   async invite({ email, role }: { email: string; role: string }) {
