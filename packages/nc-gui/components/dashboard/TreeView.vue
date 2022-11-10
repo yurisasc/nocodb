@@ -332,7 +332,7 @@ const onSearchCloseIconClick = () => {
                   <a-menu-item-group title="Connect to new datasource" class="!px-0 !mx-0">
                     <a-menu-item key="connect-new-source" @click="toggleDialog(true, 'dataSources', ClientType.MYSQL)">
                       <div class="color-transition nc-project-menu-item group">
-                        <LogosMysql class="group-hover:text-accent" />
+                        <LogosMysqlIcon class="group-hover:text-accent" />
                         MySQL
                       </div>
                     </a-menu-item>
