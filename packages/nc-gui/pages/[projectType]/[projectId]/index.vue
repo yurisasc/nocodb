@@ -179,7 +179,7 @@ onBeforeUnmount(reset)
 </script>
 
 <template>
-  <NuxtLayout id="content">
+  <NuxtLayout>
     <template #sidebar>
       <a-layout-sider
         ref="sidebar"
