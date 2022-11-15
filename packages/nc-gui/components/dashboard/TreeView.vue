@@ -163,7 +163,7 @@ function openQuickImportDialog(type: string) {
 
   const isOpen = ref(true)
 
-  const { close } = useDialog(resolveComponent('DlgQuickImportV2'), {
+  const { close } = useDialog(resolveComponent('QuickImportModal'), {
     'modelValue': isOpen,
     'importType': type,
     'onUpdate:modelValue': closeDialog,
