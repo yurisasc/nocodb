@@ -54,7 +54,10 @@ const tablesById = $computed(() =>
 )
 
 const filteredTables = $computed(() =>
-  tables.value?.filter((table) => !filterQuery || table.title.toLowerCase().includes(filterQuery.toLowerCase())),
+  tables.value?.filter(
+    (table) =>
+      (!filterQuery || table.title.toLowerCase().includes(filterQuery.toLowerCase())) && !table.title.includes('NcImportTable'),
+  ),
 )
 
 let sortable: Sortable
