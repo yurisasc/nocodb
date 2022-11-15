@@ -20,6 +20,7 @@ import {
   ref,
   useI18n,
   useProject,
+  useProvideQuickImportStore,
   useVModel,
 } from '#imports'
 import type { importFileList, streamImportFileList } from '~/lib'
@@ -33,6 +34,8 @@ interface Props {
 const { importType, importDataOnly = false, ...rest } = defineProps<Props>()
 
 const emit = defineEmits(['update:modelValue'])
+
+useProvideQuickImportStore(importType, importDataOnly)
 
 const { t } = useI18n()
 
