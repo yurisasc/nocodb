@@ -3,11 +3,11 @@ import type { TableType } from 'nocodb-sdk'
 import type { UploadChangeParam, UploadFile } from 'ant-design-vue'
 import { Upload } from 'ant-design-vue'
 import {
-  CSVTemplateAdapter,
-  ExcelTemplateAdapter,
+  CSVTemplateAdapterV2,
+  ExcelTemplateAdapterV2,
   ExcelUrlTemplateAdapter,
   Form,
-  JSONTemplateAdapter,
+  JSONTemplateAdapterV2,
   JSONUrlTemplateAdapter,
   computed,
   extractSdkResponseErrorMsg,
@@ -131,15 +131,7 @@ const disableImportButton = computed(() => !templateEditorRef.value?.isValid)
 
 const disableFormatJsonButton = computed(() => !jsonEditorRef.value?.isValid)
 
-const modalWidth = computed(() => {
-  if (importType === 'excel' && templateEditorModal.value) {
-    return 'max(90vw, 600px)'
-  }
-
-  return 'max(60vw, 600px)'
-})
-
-let templateGenerator: CSVTemplateAdapter | JSONTemplateAdapter | ExcelTemplateAdapter | null
+let templateGenerator: CSVTemplateAdapterV2 | JSONTemplateAdapterV2 | ExcelTemplateAdapterV2 | null
 
 async function handlePreImport() {
   preImportLoading.value = true
@@ -288,12 +280,12 @@ function getAdapter(val: any) {
   if (isImportTypeCsv.value) {
     switch (activeKey.value) {
       case 'uploadTab':
-        return new CSVTemplateAdapter(val, {
+        return new CSVTemplateAdapterV2(val, {
           ...importState.parserConfig,
           importFromURL: false,
         })
       case 'urlTab':
-        return new CSVTemplateAdapter(val, {
+        return new CSVTemplateAdapterV2(val, {
           ...importState.parserConfig,
           importFromURL: true,
         })
@@ -301,18 +293,18 @@ function getAdapter(val: any) {
   } else if (IsImportTypeExcel.value) {
     switch (activeKey.value) {
       case 'uploadTab':
-        return new ExcelTemplateAdapter(val, importState.parserConfig)
+        return new ExcelTemplateAdapterV2(val, importState.parserConfig)
       case 'urlTab':
         return new ExcelUrlTemplateAdapter(val, importState.parserConfig)
     }
   } else if (isImportTypeJson.value) {
     switch (activeKey.value) {
       case 'uploadTab':
-        return new JSONTemplateAdapter(val, importState.parserConfig)
+        return new JSONTemplateAdapterV2(val, importState.parserConfig)
       case 'urlTab':
         return new JSONUrlTemplateAdapter(val, importState.parserConfig)
       case 'jsonEditorTab':
-        return new JSONTemplateAdapter(val, importState.parserConfig)
+        return new JSONTemplateAdapterV2(val, importState.parserConfig)
     }
   }
 
@@ -347,8 +339,8 @@ const beforeUpload = (file: UploadFile) => {
 <template>
   <a-modal
     v-model:visible="dialogShow"
-    :width="modalWidth"
-    wrap-class-name="nc-modal-quick-import"
+    width="100%"
+    wrap-class-name="nc-modal-quick-import nc-fullscreen-modal "
     @keydown.esc="dialogShow = false"
   >
     <a-spin :spinning="isParsingData" tip="Parsing Data ..." size="large">
@@ -356,7 +348,7 @@ const beforeUpload = (file: UploadFile) => {
         <div class="prose-xl font-weight-bold my-5">{{ importMeta.header }}</div>
 
         <div class="mt-5">
-          <LazyTemplateEditor
+          <LazyTemplateEditorV2
             v-if="templateEditorModal"
             ref="templateEditorRef"
             :project-template="templateData"

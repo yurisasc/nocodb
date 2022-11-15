@@ -30,3 +30,24 @@ For Drag and Drop
 .grabbing * {
 	cursor: grabbing;
 }
+
+/*
+For Full screen modal
+*/
+
+.nc-fullscreen-modal .ant-modal {
+	max-width: 100%;
+	top: 0 !important;
+	padding-bottom: 0;
+	margin: 0;
+}
+
+.nc-fullscreen-modal .ant-modal-content {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh);
+}
+
+.nc-fullscreen-modal  .ant-modal-body {
+	flex: 1;
+}
