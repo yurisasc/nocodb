@@ -1,9 +1,9 @@
 import type { UploadFile } from 'ant-design-vue'
-import { useInjectionState } from '#imports'
+import { generateUniqueTitle, useInjectionState } from '#imports'
 
 const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
   (importType: 'csv' | 'json' | 'excel', importDataOnly = false) => {
-    const { project } = useProject()
+    const { project, tables } = useProject()
 
     const { t } = useI18n()
 
@@ -35,13 +35,17 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
     const IsImportTypeExcel = computed(() => importType === 'excel')
 
     async function _createTempTable(source: string | UploadFile) {
-      // leave title empty to get a generated one based on table_name
+      // leave title empty to get a generated one based on   table_name
       table.title = ''
-      table.table_name = `NC_IMPORT_TEMP_${(
-        (parserConfig.value.importFromURL ? (source as string).split('/').pop() : (source as UploadFile).name) as string
+      table.table_name = generateUniqueTitle(
+        `NC_IMPORT_TABLE_${(
+          (parserConfig.value.importFromURL ? (source as string).split('/').pop() : (source as UploadFile).name) as string
+        )
+          .replace(/[` ~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/g, '_')
+          .trim()!}`,
+        tables.value,
+        'table_name',
       )
-        .replace(/[` ~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/g, '_')
-        .trim()!}`
       table.columns = ['id', 'created_at', 'updated_at']
       await createTable()
     }
