@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import type { ColumnType, TableType } from 'nocodb-sdk'
 import { UITypes, isSystemColumn, isVirtualCol } from 'nocodb-sdk'
-import { srcDestMappingColumns, tableColumns } from './utils'
+import { srcDestMappingColumns, tableColumns } from '../template/utils'
 import {
   Empty,
   Form,
