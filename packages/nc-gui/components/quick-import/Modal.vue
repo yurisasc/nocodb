@@ -347,8 +347,10 @@ const beforeUpload = (file: UploadFile) => {
       <div class="px-5">
         <div class="prose-xl font-weight-bold my-5">{{ importMeta.header }}</div>
 
+        <LazyQuickImportStepper />
+
         <div class="mt-5">
-          <LazyTemplateEditorV2
+          <LazyQuickImportEditor
             v-if="templateEditorModal"
             ref="templateEditorRef"
             :project-template="templateData"
