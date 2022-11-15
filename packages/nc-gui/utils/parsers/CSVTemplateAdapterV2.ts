@@ -100,6 +100,8 @@ export default class CSVTemplateAdapter {
             reject(e)
           },
         })
+      } else {
+        resolve(true)
       }
     })
   }
