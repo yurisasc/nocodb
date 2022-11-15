@@ -20,13 +20,13 @@ interface UseDialogOptions {
  *
  * @example
  * import { useDialog } from '#imports'
- * import DlgQuickImport from '~/components/dlg/QuickImport.vue'
+ * import DlgQuickImport from '~/components/quick-import/Modal.vue'
  *
  * function openQuickImportDialog(type: string) {
  *   // create a ref for showing/hiding the modal
  *   const isOpen = ref(true)
  *
- *   const { close, vNode } = useDialog(DlgQuickImport, {
+ *   const { close, vNode } = useDialog(QuickImportModal, {
  *     'modelValue': isOpen,
  *     'importType': type,
  *     'onUpdate:modelValue': closeDialog,
