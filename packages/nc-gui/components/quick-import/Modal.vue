@@ -63,24 +63,15 @@ const isParsingData = ref(false)
 
 const useForm = Form.useForm
 
+const { source, parserConfig, isImportTypeJson, isImportTypeCsv, IsImportTypeExcel, createTempTable } =
+  useQuickImportStoreOrThrow()!
+
 const importState = reactive({
   fileList: [] as importFileList | streamImportFileList,
   url: '',
   jsonEditor: {},
-  parserConfig: {
-    maxRowsToParse: 500,
-    normalizeNested: true,
-    autoSelectFieldTypes: true,
-    firstRowAsHeaders: true,
-    shouldImportData: true,
-  },
+  parserConfig: parserConfig.value,
 })
-
-const isImportTypeJson = computed(() => importType === 'json')
-
-const isImportTypeCsv = computed(() => importType === 'csv')
-
-const IsImportTypeExcel = computed(() => importType === 'excel')
 
 const validators = computed(() => ({
   url: [fieldRequiredValidator(), importUrlValidator, isImportTypeCsv.value ? importCsvUrlValidator : importExcelUrlValidator],
@@ -142,19 +133,23 @@ async function handlePreImport() {
 
   if (activeKey.value === 'uploadTab') {
     if (isImportTypeCsv.value) {
-      await parseAndExtractData(importState.fileList as streamImportFileList)
+      source.value = importState.fileList as streamImportFileList
+      await parseAndExtractData()
     } else {
-      await parseAndExtractData((importState.fileList as importFileList)[0].data)
+      source.value = (importState.fileList as importFileList)[0].data
+      await parseAndExtractData()
     }
   } else if (activeKey.value === 'urlTab') {
     try {
       await validate()
-      await parseAndExtractData(importState.url)
+      source.value = importState.url
+      await parseAndExtractData()
     } catch (e: any) {
       message.error(await extractSdkResponseErrorMsg(e))
     }
   } else if (activeKey.value === 'jsonEditorTab') {
-    await parseAndExtractData(JSON.stringify(importState.jsonEditor))
+    source.value = JSON.stringify(importState.jsonEditor)
+    await parseAndExtractData()
   }
 }
 
@@ -177,20 +172,20 @@ async function handleImport() {
 // UploadFile[] for csv import (streaming)
 // ArrayBuffer for excel import
 // string for json import
-async function parseAndExtractData(val: UploadFile[] | ArrayBuffer | string) {
+async function parseAndExtractData() {
   try {
     templateData.value = null
     importData.value = null
     importColumns.value = []
 
-    // TODO(import):
-
-    templateGenerator = getAdapter(val)
+    templateGenerator = getAdapter()
 
     if (!templateGenerator) {
       message.error(t('msg.error.templateGeneratorNotFound'))
       return
     }
+
+    await createTempTable()
 
     await templateGenerator.init()
 
@@ -279,16 +274,16 @@ function populateUniqueTableName(tn: string) {
   return tn
 }
 
-function getAdapter(val: any) {
+function getAdapter() {
   if (isImportTypeCsv.value) {
     switch (activeKey.value) {
       case 'uploadTab':
-        return new CSVTemplateAdapterV2(val, {
+        return new CSVTemplateAdapterV2(source.value as UploadFile[], {
           ...importState.parserConfig,
           importFromURL: false,
         })
       case 'urlTab':
-        return new CSVTemplateAdapterV2(val, {
+        return new CSVTemplateAdapterV2(source.value as string, {
           ...importState.parserConfig,
           importFromURL: true,
         })
@@ -296,18 +291,17 @@ function getAdapter(val: any) {
   } else if (IsImportTypeExcel.value) {
     switch (activeKey.value) {
       case 'uploadTab':
-        return new ExcelTemplateAdapterV2(val, importState.parserConfig)
+        return new ExcelTemplateAdapterV2(source.value as ArrayBuffer, importState.parserConfig)
       case 'urlTab':
-        return new ExcelUrlTemplateAdapter(val, importState.parserConfig)
+        return new ExcelUrlTemplateAdapter(source.value as string, importState.parserConfig)
     }
   } else if (isImportTypeJson.value) {
     switch (activeKey.value) {
       case 'uploadTab':
-        return new JSONTemplateAdapterV2(val, importState.parserConfig)
-      case 'urlTab':
-        return new JSONUrlTemplateAdapter(val, importState.parserConfig)
       case 'jsonEditorTab':
-        return new JSONTemplateAdapterV2(val, importState.parserConfig)
+        return new JSONTemplateAdapterV2(source.value as object, importState.parserConfig)
+      case 'urlTab':
+        return new JSONUrlTemplateAdapter(source.value as string, importState.parserConfig)
     }
   }
 
