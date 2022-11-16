@@ -45,7 +45,7 @@ For Full screen modal
 .nc-fullscreen-modal .ant-modal-content {
 	display: flex;
 	flex-direction: column;
-	height: calc(100vh);
+	min-height: calc(100vh);
 }
 
 .nc-fullscreen-modal  .ant-modal-body {
