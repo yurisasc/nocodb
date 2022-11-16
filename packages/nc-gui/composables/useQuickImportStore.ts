@@ -3,13 +3,18 @@ import { generateUniqueTitle, useInjectionState } from '#imports'
 
 const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
   (importType: 'csv' | 'json' | 'excel', importDataOnly = false) => {
+    enum IMPORT_STEPS {
+      STEP_1_UPLOAD_DATA = 0,
+      STEP_2_REVIEW_DATA = 1,
+      STEP_3_LOAD_TO_DATABASE = 2,
+    }
     const { project, tables } = useProject()
 
     const { t } = useI18n()
 
     const { $e, $api } = useNuxtApp()
 
-    const importStepper = ref<number>(0)
+    const importStepper = ref<number>(IMPORT_STEPS.STEP_1_UPLOAD_DATA)
 
     const source = ref<UploadFile[] | ArrayBuffer | string | object>()
 
@@ -65,6 +70,7 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
     }
 
     return {
+      IMPORT_STEPS,
       source,
       importStepper,
       isImportTypeJson,
