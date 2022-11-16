@@ -6,6 +6,7 @@ import GithubButton from 'vue-github-button'
 import type { VNodeRef } from '#imports'
 import {
   Empty,
+  IsQuickImportInj,
   computed,
   reactive,
   ref,
@@ -37,6 +38,8 @@ const { isUIAllowed } = useUIPermission()
 
 const [searchActive, toggleSearchActive] = useToggle()
 
+const isQuickImport = inject(IsQuickImportInj, ref(false))
+
 let key = $ref(0)
 
 const menuRef = $ref<HTMLLIElement>()
@@ -53,12 +56,18 @@ const tablesById = $computed(() =>
   }, {}),
 )
 
-const filteredTables = $computed(() =>
-  tables.value?.filter(
-    (table) =>
-      (!filterQuery || table.title.toLowerCase().includes(filterQuery.toLowerCase())) && !table.title.includes('NcImportTable'),
-  ),
-)
+const filteredTables = $computed(() => {
+  return tables.value?.filter((table) => {
+    if (isQuickImport.value) {
+      // only include NC_IMPORT_TABLE
+      return table.title.includes('NcImportTable')
+    }
+    // filter with query + exclude NC_IMPORT_TABLE
+    return (
+      (!filterQuery || table.title.toLowerCase().includes(filterQuery.toLowerCase())) && !table.title.includes('NcImportTable')
+    )
+  })
+})
 
 let sortable: Sortable
 
@@ -238,7 +247,7 @@ const onSearchCloseIconClick = () => {
             <span v-else class="flex-1 text-bold uppercase nc-project-tree text-gray-500 font-weight-bold">
               {{ $t('objects.tables') }}
 
-              <template v-if="tables?.length"> ({{ tables.length }}) </template>
+              <template v-if="filteredTables?.length"> ({{ filteredTables.length }}) </template>
             </span>
           </Transition>
 
