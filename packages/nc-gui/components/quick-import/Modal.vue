@@ -7,6 +7,7 @@ import {
   ExcelTemplateAdapterV2,
   ExcelUrlTemplateAdapter,
   Form,
+  IsQuickImportInj,
   JSONTemplateAdapterV2,
   JSONUrlTemplateAdapter,
   computed,
@@ -331,6 +332,8 @@ const beforeUpload = (file: UploadFile) => {
   }
   return !exceedLimit || Upload.LIST_IGNORE
 }
+
+provide(IsQuickImportInj, ref(true))
 </script>
 
 <template>
