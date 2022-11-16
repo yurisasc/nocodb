@@ -1,4 +1,5 @@
 import type { UploadFile } from 'ant-design-vue'
+import type { TableType } from 'nocodb-sdk'
 import { generateUniqueTitle, useInjectionState } from '#imports'
 
 const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
@@ -27,10 +28,10 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
       importFromURL: false,
     })
 
-    const importedTables = ref<String[]>([])
+    const importedTables = ref<TableType[]>([])
 
     const { table, createTable } = useTable(async (table) => {
-      importedTables.value.push(table.table_name)
+      importedTables.value.push(table)
     })
 
     const isImportTypeJson = computed(() => importType === 'json')
