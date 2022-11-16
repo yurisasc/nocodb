@@ -1,40 +1,5 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import type { ColumnType, TableType } from 'nocodb-sdk'
-import { UITypes, isSystemColumn, isVirtualCol } from 'nocodb-sdk'
-import { srcDestMappingColumns, tableColumns } from '../template/utils'
-import {
-  Empty,
-  Form,
-  MetaInj,
-  ReloadViewDataHookInj,
-  computed,
-  createEventHook,
-  extractSdkResponseErrorMsg,
-  fieldRequiredValidator,
-  getDateFormat,
-  getDateTimeFormat,
-  getUIDTIcon,
-  inject,
-  message,
-  nextTick,
-  onMounted,
-  parseStringDate,
-  reactive,
-  ref,
-  useI18n,
-  useNuxtApp,
-  useProject,
-  useTabs,
-} from '#imports'
-import { TabType } from '~/lib'
-
-const { quickImportType, projectTemplate, importData, importColumns, importDataOnly, maxRowsToParse } = defineProps<Props>()
-
-const emit = defineEmits(['import'])
-
-dayjs.extend(utc)
+import { MetaInj, ReloadViewDataHookInj, computed, createEventHook, inject, ref, useI18n, useNuxtApp, useProject } from '#imports'
 
 const { t } = useI18n()
 
@@ -44,15 +9,22 @@ const columns = computed(() => meta.value?.columns || [])
 
 const reloadHook = inject(ReloadViewDataHookInj, createEventHook())
 
-const useForm = Form.useForm
-
 const { $api } = useNuxtApp()
 
-const { sqlUi, project, loadTables } = useProject()
+const { sqlUi, project } = useProject()
 </script>
 
 <template>
-  <LazySmartsheetGrid />
+  <a-layout>
+    <a-layout-sider theme="light">
+      <LazyDashboardTreeView />
+    </a-layout-sider>
+    <a-layout-content>
+      <div class="nc-container flex flex-col h-full mt-1.5 px-12">
+        <LazySmartsheetGrid />
+      </div>
+    </a-layout-content>
+  </a-layout>
 </template>
 
 <style scoped lang="scss"></style>
