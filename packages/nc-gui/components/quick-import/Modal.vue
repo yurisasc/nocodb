@@ -60,8 +60,6 @@ const importData = ref()
 
 const importColumns = ref([])
 
-const templateEditorModal = ref(false)
-
 const isParsingData = ref(false)
 
 const useForm = Form.useForm
@@ -77,7 +75,6 @@ const importState = reactive({
 
 const validators = computed(() => ({
   url: [fieldRequiredValidator(), importUrlValidator, isImportTypeCsv.value ? importCsvUrlValidator : importExcelUrlValidator],
-  maxRowsToParse: [fieldRequiredValidator()],
 }))
 
 const { validate, validateInfos } = useForm(importState, validators)
@@ -203,7 +200,6 @@ async function parseAndExtractData() {
       }))
     }
     importData.value = templateGenerator!.getData()
-    templateEditorModal.value = true
 
     importStepper.value = IMPORT_STEPS.STEP_2_REVIEW_DATA
   } catch (e: any) {
@@ -351,20 +347,14 @@ const beforeUpload = (file: UploadFile) => {
         <LazyQuickImportStepper />
 
         <div class="mt-5">
-          <LazyQuickImportEditor
-            v-if="templateEditorModal"
-            ref="templateEditorRef"
-            :project-template="templateData"
-            :import-data="importData"
-            :import-columns="importColumns"
-            :import-data-only="importDataOnly"
-            :quick-import-type="importType"
-            :max-rows-to-parse="importState.parserConfig.maxRowsToParse"
-            class="nc-quick-import-template-editor"
-            @import="handleImport"
-          />
-
-          <a-tabs v-else v-model:activeKey="activeKey" hide-add type="editable-card" tab-position="top">
+          <!-- Step 1: Upload Data -->
+          <a-tabs
+            v-if="importStepper === IMPORT_STEPS.STEP_1_UPLOAD_DATA"
+            v-model:activeKey="activeKey"
+            hide-add
+            type="editable-card"
+            tab-position="top"
+          >
             <a-tab-pane key="uploadTab" :closable="false">
               <template #tab>
                 <!--              Upload -->
@@ -430,75 +420,47 @@ const beforeUpload = (file: UploadFile) => {
               </div>
             </a-tab-pane>
           </a-tabs>
-        </div>
 
-        <div v-if="!templateEditorModal">
-          <a-divider />
+          <LazyQuickImportAdvancedSettings v-if="importStepper === IMPORT_STEPS.STEP_1_UPLOAD_DATA" />
 
-          <div class="mb-4">
-            <!-- Advanced Settings -->
-            <span class="prose-lg">{{ $t('title.advancedSettings') }}</span>
-
-            <a-form-item class="!my-2" :label="t('msg.info.footMsg')" v-bind="validateInfos.maxRowsToParse">
-              <a-input-number v-model:value="importState.parserConfig.maxRowsToParse" :min="1" :max="50000" />
-            </a-form-item>
-
-            <a-form-item v-if="!importDataOnly" class="!my-2">
-              <a-checkbox v-model:checked="importState.parserConfig.autoSelectFieldTypes">
-                <span class="caption">Auto-Select Field Types</span>
-              </a-checkbox>
-            </a-form-item>
-
-            <a-form-item v-if="isImportTypeCsv || IsImportTypeExcel" class="!my-2">
-              <a-checkbox v-model:checked="importState.parserConfig.firstRowAsHeaders">
-                <span class="caption">Use First Row as Headers</span>
-              </a-checkbox>
-            </a-form-item>
-
-            <!-- Flatten nested -->
-            <a-form-item v-if="isImportTypeJson" class="!my-2">
-              <a-checkbox v-model:checked="importState.parserConfig.normalizeNested">
-                <span class="caption">{{ $t('labels.flattenNested') }}</span>
-              </a-checkbox>
-            </a-form-item>
-
-            <!-- Import Data -->
-            <a-form-item v-if="!importDataOnly" class="!my-2">
-              <a-checkbox v-model:checked="importState.parserConfig.shouldImportData">{{ $t('labels.importData') }}</a-checkbox>
-            </a-form-item>
-          </div>
+          <!-- Step 2: Review Data -->
+          <LazyQuickImportEditor
+            v-if="importStepper === IMPORT_STEPS.STEP_2_REVIEW_DATA"
+            ref="templateEditorRef"
+            class="nc-quick-import-template-editor"
+          />
         </div>
       </div>
     </a-spin>
     <template #footer>
-      <a-button v-if="templateEditorModal" key="back" @click="templateEditorModal = false">Back</a-button>
+      <template v-if="importStepper === IMPORT_STEPS.STEP_1_UPLOAD_DATA">
+        <a-button
+          key="pre-import"
+          type="primary"
+          class="nc-btn-import"
+          :loading="preImportLoading"
+          :disabled="disablePreImportButton"
+          @click="handlePreImport"
+        >
+          {{ $t('activity.import') }}
+        </a-button>
 
-      <a-button v-else key="cancel" @click="dialogShow = false">{{ $t('general.cancel') }}</a-button>
+        <a-button v-if="activeKey === 'jsonEditorTab'" key="format" :disabled="disableFormatJsonButton" @click="formatJson">
+          Format JSON
+        </a-button>
+      </template>
 
-      <a-button
-        v-if="activeKey === 'jsonEditorTab' && !templateEditorModal"
-        key="format"
-        :disabled="disableFormatJsonButton"
-        @click="formatJson"
-      >
-        Format JSON
-      </a-button>
+      <template v-if="importStepper === IMPORT_STEPS.STEP_2_REVIEW_DATA">
+        <a-button key="back" @click="importStepper = IMPORT_STEPS.STEP_1_UPLOAD_DATA"> Back </a-button>
+      </template>
 
-      <a-button
-        v-if="!templateEditorModal"
-        key="pre-import"
-        type="primary"
-        class="nc-btn-import"
-        :loading="preImportLoading"
-        :disabled="disablePreImportButton"
-        @click="handlePreImport"
-      >
-        {{ $t('activity.import') }}
-      </a-button>
+      <template v-if="importStepper === IMPORT_STEPS.STEP_3_LOAD_TO_DATABASE">
+        <a-button key="import" type="primary" :loading="importLoading" :disabled="disableImportButton" @click="handleImport">
+          {{ $t('activity.import') }}
+        </a-button>
+      </template>
 
-      <a-button v-else key="import" type="primary" :loading="importLoading" :disabled="disableImportButton" @click="handleImport">
-        {{ $t('activity.import') }}
-      </a-button>
+      <a-button key="cancel" @click="dialogShow = false">{{ $t('general.cancel') }}</a-button>
     </template>
   </a-modal>
 </template>
