@@ -20,7 +20,7 @@ import {
   ref,
   useI18n,
   useProject,
-  useProvideQuickImportStore,
+  useQuickImportStoreOrThrow,
   useVModel,
 } from '#imports'
 import type { importFileList, streamImportFileList } from '~/lib'
@@ -36,6 +36,9 @@ const { importType, importDataOnly = false, ...rest } = defineProps<Props>()
 const emit = defineEmits(['update:modelValue'])
 
 useProvideQuickImportStore(importType, importDataOnly)
+
+const { source, parserConfig, isImportTypeJson, isImportTypeCsv, IsImportTypeExcel, createTempTable } =
+  useQuickImportStoreOrThrow()!
 
 const { t } = useI18n()
 
@@ -63,8 +66,7 @@ const isParsingData = ref(false)
 
 const useForm = Form.useForm
 
-const { source, parserConfig, isImportTypeJson, isImportTypeCsv, IsImportTypeExcel, createTempTable } =
-  useQuickImportStoreOrThrow()!
+const { IMPORT_STEPS, importStepper } = useQuickImportStoreOrThrow()!
 
 const importState = reactive({
   fileList: [] as importFileList | streamImportFileList,
@@ -202,6 +204,8 @@ async function parseAndExtractData() {
     }
     importData.value = templateGenerator!.getData()
     templateEditorModal.value = true
+
+    importStepper.value = IMPORT_STEPS.STEP_2_REVIEW_DATA
   } catch (e: any) {
     message.error(await extractSdkResponseErrorMsg(e))
   } finally {
