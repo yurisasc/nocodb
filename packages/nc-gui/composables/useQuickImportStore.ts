@@ -72,6 +72,8 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
     return {
       IMPORT_STEPS,
       source,
+      importType,
+      importDataOnly,
       importStepper,
       isImportTypeJson,
       isImportTypeCsv,
