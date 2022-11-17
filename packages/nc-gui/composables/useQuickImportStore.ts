@@ -22,6 +22,8 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
 
     const previousActiveTabIndex = ref(-1)
 
+    const activeQuickImportTab = computed(() => quickImportTabs.value?.[activeTabIndex.value])
+
     const getPredicate = (key: Partial<TabItem>) => {
       return (tab: TabItem) =>
         (!('id' in key) || tab.id === key.id) &&
@@ -125,6 +127,7 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
       createTempTable,
       parserConfig,
       // Tabs
+      activeQuickImportTab,
       activeTabIndex,
       quickImportTabs,
       addQuickImportTab,
