@@ -185,13 +185,12 @@ async function parseAndExtractData() {
       return
     }
 
-    await createTempTable()
-
     await templateGenerator.init()
 
     await templateGenerator.parse()
 
     templateData.value = templateGenerator!.getTemplate()
+
     if (importDataOnly) importColumns.value = templateGenerator!.getColumns()
     else {
       // ensure the target table name not exist in current table list
@@ -200,7 +199,14 @@ async function parseAndExtractData() {
         table_name: populateUniqueTableName(table.table_name),
       }))
     }
-    importData.value = templateGenerator!.getData()
+
+    await Promise.all(
+      templateData.value.tables.map(async (table: Record<string, any>) => {
+        await createTempTable(table)
+      }),
+    )
+    // TODO: bulk import data
+    // await templateGenerator.import()
 
     importStepper.value = IMPORT_STEPS.STEP_2_REVIEW_DATA
   } catch (e: any) {
