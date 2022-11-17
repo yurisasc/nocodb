@@ -1,6 +1,7 @@
 import type { UploadFile } from 'ant-design-vue'
 import type { TableType } from 'nocodb-sdk'
 import { generateUniqueTitle, useInjectionState } from '#imports'
+import type { TabItem } from '~/lib'
 
 const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
   (importType: 'csv' | 'json' | 'excel', importDataOnly = false) => {
@@ -15,7 +16,49 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
 
     const { $e, $api } = useNuxtApp()
 
-    const importStepper = ref<number>(IMPORT_STEPS.STEP_1_UPLOAD_DATA)
+    const quickImportTabs = ref<TabItem[]>([])
+
+    const activeTabIndex = ref<number>(0)
+
+    const previousActiveTabIndex = ref(-1)
+
+    const getPredicate = (key: Partial<TabItem>) => {
+      return (tab: TabItem) =>
+        (!('id' in key) || tab.id === key.id) &&
+        (!('title' in key) || tab.title === key.title) &&
+        (!('type' in key) || tab.type === key.type)
+    }
+
+    const addQuickImportTab = (tabMeta: TabItem) => {
+      tabMeta.sortsState = tabMeta.sortsState || new Map()
+      tabMeta.filterState = tabMeta.filterState || new Map()
+      const tabIndex = quickImportTabs.value.findIndex((tab) => tab.id === tabMeta.id)
+      // if tab already found make it active
+      if (tabIndex > -1) {
+        activeTabIndex.value = tabIndex
+      }
+      // if tab not found add it
+      else {
+        quickImportTabs.value = [...(quickImportTabs.value || []), tabMeta]
+        activeTabIndex.value = quickImportTabs.value.length - 1
+      }
+    }
+
+    const closeQuickImportTab = async (key: number | Partial<TabItem>) => {
+      const index = typeof key === 'number' ? key : quickImportTabs.value.findIndex(getPredicate(key))
+      quickImportTabs.value.splice(index, 1)
+    }
+
+    const updateQuickImportTab = (key: number | Partial<TabItem>, newTabItemProps: Partial<TabItem>) => {
+      const tab = typeof key === 'number' ? quickImportTabs.value[key] : quickImportTabs.value.find(getPredicate(key))
+
+      if (tab) {
+        const isActive = quickImportTabs.value.indexOf(tab) === previousActiveTabIndex.value
+        Object.assign(tab, newTabItemProps)
+      }
+    }
+
+    const importStepper = ref<number>(IMPORT_STEPS.STEP_2_REVIEW_DATA)
 
     const source = ref<UploadFile[] | ArrayBuffer | string | object>()
 
@@ -81,6 +124,12 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
       IsImportTypeExcel,
       createTempTable,
       parserConfig,
+      // Tabs
+      activeTabIndex,
+      quickImportTabs,
+      addQuickImportTab,
+      closeQuickImportTab,
+      updateQuickImportTab,
     }
   },
   'quick-import-store',
