@@ -149,7 +149,12 @@ const reloadTables = async () => {
 }
 
 const addTableTab = (table: TableType) => {
-  addTab({ title: table.title, id: table.id, type: table.type as TabType })
+  if (isQuickImport.value) {
+    const { addQuickImportTab } = useQuickImportStoreOrThrow()!
+    addQuickImportTab({ title: table.title, id: table.id, type: table.type as TabType })
+  } else {
+    addTab({ title: table.title, id: table.id, type: table.type as TabType })
+  }
 }
 
 function openRenameTableDialog(table: TableType, rightClick = false) {
