@@ -73,11 +73,7 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
       importFromURL: false,
     })
 
-    const importedTables = ref<TableType[]>([])
-
-    const { table, createTable } = useTable(async (table) => {
-      importedTables.value.push(table)
-    })
+    const { table, createTable } = useTable()
 
     const isImportTypeJson = computed(() => importType === 'json')
 
@@ -85,34 +81,18 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
 
     const IsImportTypeExcel = computed(() => importType === 'excel')
 
-    async function _createTempTable(source: string | UploadFile) {
-      // leave title empty to get a generated one based on   table_name
+    async function createTempTable(t: Record<string, any>) {
+      // leave title empty to get a generated one based on table_name
       table.title = ''
-      table.table_name = generateUniqueTitle(
-        `NC_IMPORT_TABLE_${(
-          (parserConfig.value.importFromURL ? (source as string).split('/').pop() : (source as UploadFile).name) as string
-        )
-          .replace(/[` ~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/g, '_')
-          .trim()!}`,
-        tables.value,
-        'table_name',
-      )
-      table.columns = ['id', 'created_at', 'updated_at']
+      table.table_name = generateUniqueTitle(`NC_IMPORT_TABLE_${t.table_name}`, tables.value, 'table_name')
+      table.columns = [
+        'id',
+        'created_at',
+        'updated_at',
+        ...t.columns.map((t: { column_name: string; key: number }) => t.column_name),
+      ]
+      console.log(table)
       await createTable()
-    }
-
-    async function createTempTable() {
-      if (parserConfig.value.importFromURL) {
-        await _createTempTable(source.value as string)
-      } else {
-        await Promise.all(
-          (source.value as UploadFile[]).map((file: UploadFile, tableIdx: number) =>
-            (async (f) => {
-              await _createTempTable(f)
-            })(file),
-          ),
-        )
-      }
     }
 
     return {
