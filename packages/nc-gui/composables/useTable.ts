@@ -37,7 +37,7 @@ export function useTable(onTableCreate?: (tableMeta: TableType) => void) {
 
   const createTable = async () => {
     if (!sqlUi?.value) return
-    const columns = sqlUi?.value?.getNewTableColumns().filter((col) => {
+    const systemColumns = sqlUi?.value?.getNewTableColumns().filter((col) => {
       if (col.column_name === 'id' && table.columns.includes('id_ag')) {
         Object.assign(col, sqlUi?.value?.getDataTypeForUiType({ uidt: UITypes.ID }, 'AG'))
         col.dtxp = sqlUi?.value?.getDefaultLengthForDatatype(col.dt)
@@ -47,10 +47,20 @@ export function useTable(onTableCreate?: (tableMeta: TableType) => void) {
       return table.columns.includes(col.column_name)
     })
 
+    // create custom columns (e.g. from Quick Import)
+    const customColumns = table.columns
+      .filter((cn) => !SYSTEM_COLUMNS.includes(cn))
+      .map((cn) => {
+        // Use SingleLineText by default
+        const newColumn = sqlUi?.value?.getNewColumn('')
+        newColumn.column_name = cn
+        return newColumn
+      })
+
     try {
       const tableMeta = await $api.dbTable.create(project?.value?.id as string, {
         ...table,
-        columns,
+        columns: [...systemColumns, ...customColumns],
       })
       $e('a:table:create')
       onTableCreate?.(tableMeta)
