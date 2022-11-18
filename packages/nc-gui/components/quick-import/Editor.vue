@@ -27,6 +27,8 @@ provide(MetaInj, meta)
 
 provide(ActiveViewInj, activeView)
 
+provide(FieldsInj, ref(meta.value?.columns || []))
+
 watch(activeQuickImportTab, async () => {
   // include the quick import table in metas
   await getMeta(activeQuickImportTab.value?.id!)
