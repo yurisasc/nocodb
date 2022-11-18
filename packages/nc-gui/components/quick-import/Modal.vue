@@ -38,12 +38,12 @@ const emit = defineEmits(['update:modelValue'])
 
 useProvideQuickImportStore(importType, importDataOnly)
 
-const { source, parserConfig, isImportTypeJson, isImportTypeCsv, IsImportTypeExcel, createTempTable } =
+const { source, parserConfig, isImportTypeJson, isImportTypeCsv, IsImportTypeExcel, createTempTable, importTempTable } =
   useQuickImportStoreOrThrow()!
 
 const { t } = useI18n()
 
-const { tables } = useProject()
+const { tables, loadTables } = useProject()
 
 const activeKey = ref('uploadTab')
 
@@ -191,13 +191,20 @@ async function parseAndExtractData() {
 
     templateData.value = templateGenerator!.getTemplate()
 
+    const data = templateGenerator!.getData()
+
     if (importDataOnly) importColumns.value = templateGenerator!.getColumns()
     else {
       // ensure the target table name not exist in current table list
-      templateData.value.tables = templateData.value.tables.map((table: Record<string, any>) => ({
-        ...table,
-        table_name: populateUniqueTableName(table.table_name),
-      }))
+      templateData.value.tables = templateData.value.tables.map((table: Record<string, any>) => {
+        const uniqueTn = populateUniqueTableName(table.table_name)
+        // rename key in data
+        delete Object.assign(data, { [uniqueTn]: data[table.table_name] })[table.table_name]
+        return {
+          ...table,
+          table_name: uniqueTn,
+        }
+      })
     }
 
     await Promise.all(
@@ -205,8 +212,17 @@ async function parseAndExtractData() {
         await createTempTable(table)
       }),
     )
-    // TODO: bulk import data
-    // await templateGenerator.import()
+
+    await loadTables()
+
+    // bulk import data to temp tables
+    if (parserConfig.value.shouldImportData) {
+      await Promise.all(
+        Object.keys(data).map(async (tn: string) => {
+          await importTempTable(tn, data[tn])
+        }),
+      )
+    }
 
     importStepper.value = IMPORT_STEPS.STEP_2_REVIEW_DATA
   } catch (e: any) {
