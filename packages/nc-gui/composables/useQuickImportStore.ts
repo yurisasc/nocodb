@@ -10,7 +10,7 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
       STEP_2_REVIEW_DATA = 1,
       STEP_3_LOAD_TO_DATABASE = 2,
     }
-    const { project, tables } = useProject()
+    const { project } = useProject()
 
     const { t } = useI18n()
 
@@ -60,7 +60,7 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
       }
     }
 
-    const importStepper = ref<number>(IMPORT_STEPS.STEP_2_REVIEW_DATA)
+    const importStepper = ref<number>(IMPORT_STEPS.STEP_1_UPLOAD_DATA)
 
     const source = ref<UploadFile[] | ArrayBuffer | string | object>()
 
@@ -73,7 +73,12 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
       importFromURL: false,
     })
 
-    const { table, createTable } = useTable()
+    // raw table name --> Title created in DB
+    const tnMappings = ref<Record<string, any>>({})
+
+    const { table, createTable } = useTable(async (t) => {
+      tnMappings.value[table.table_name] = t.title
+    })
 
     const isImportTypeJson = computed(() => importType === 'json')
 
@@ -84,17 +89,26 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
     async function createTempTable(t: Record<string, any>) {
       // leave title empty to get a generated one based on table_name
       table.title = ''
-      table.table_name = generateUniqueTitle(`NC_IMPORT_TABLE_${t.table_name}`, tables.value, 'table_name')
+      table.table_name = t.table_name
       table.columns = [
         'id',
         'created_at',
         'updated_at',
         ...t.columns.map((t: { column_name: string; key: number }) => t.column_name),
       ]
-      console.log(table)
+
       await createTable()
     }
 
+    async function importTempTable(tableTitle: string, data: Record<string, any>[]) {
+      if (data) {
+        const offset = parserConfig.value.maxRowsToParse
+        for (let i = 0; i < data.length; i += offset) {
+          const batchData = data.slice(i, i + offset)
+          await $api.dbTableRow.bulkCreate('noco', project.value.title!, tnMappings.value[tableTitle], batchData)
+        }
+      }
+    }
     return {
       IMPORT_STEPS,
       source,
@@ -105,6 +119,7 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
       isImportTypeCsv,
       IsImportTypeExcel,
       createTempTable,
+      importTempTable,
       parserConfig,
       // Tabs
       activeQuickImportTab,
