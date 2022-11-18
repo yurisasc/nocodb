@@ -1,6 +1,5 @@
 import { parse } from 'papaparse'
 import type { UploadFile } from 'ant-design-vue'
-import { UITypes } from 'nocodb-sdk'
 
 export default class CSVTemplateAdapter {
   config: Record<string, any>
@@ -31,11 +30,10 @@ export default class CSVTemplateAdapter {
 
   async init() {}
 
-  initTemplate(tableIdx: number, tn: string, columnNames: string[]) {
+  async initTemplate(tableIdx: number, tn: string, columnNames: string[]) {
     const columnNameRowExist = +columnNames.every((v: any) => v === null || typeof v === 'string')
     const columnNamePrefixRef: Record<string, any> = { id: 0 }
 
-    // TODO: table name
     const tableObj: Record<string, any> = {
       table_name: tn,
       ref_table_name: tn,
@@ -54,14 +52,9 @@ export default class CSVTemplateAdapter {
       }
       columnNamePrefixRef[cn] = 0
 
-      this.detectedColumnTypes[columnIdx] = {}
-      this.distinctValues[columnIdx] = new Set<string>()
       this.columnValues[columnIdx] = []
       tableObj.columns.push({
         column_name: cn,
-        ref_column_name: cn,
-        meta: {},
-        uidt: UITypes.SingleLineText,
         key: columnIdx,
       })
 
@@ -70,49 +63,16 @@ export default class CSVTemplateAdapter {
     }
   }
 
-  async _parseTableData(tableIdx: number, source: UploadFile | string, tn: string) {
+  async import(tableIdx: number, source: UploadFile | string) {
     return new Promise((resolve, reject) => {
       const that = this
       let steppers = 0
-      if (that.config.shouldImportData) {
-        steppers = 0
-        const parseSource = (this.config.importFromURL ? (source as string) : (source as UploadFile).originFileObj)!
-        parse(parseSource, {
-          download: that.config.importFromURL,
-          worker: true,
-          skipEmptyLines: 'greedy',
-          step(row) {
-            steppers += 1
-            if (row && steppers >= +that.config.firstRowAsHeaders + 1) {
-              const rowData: Record<string, any> = {}
-              for (let columnIdx = 0; columnIdx < that.headers[tableIdx].length; columnIdx++) {
-                const column = that.tables[tableIdx].columns[columnIdx]
-                const data = (row.data as [])[columnIdx] === '' ? null : (row.data as [])[columnIdx]
-                rowData[column.column_name] = data
-              }
-              that.data[tn].push(rowData)
-            }
-          },
-          complete() {
-            resolve(true)
-          },
-          error(e: Error) {
-            reject(e)
-          },
-        })
-      } else {
-        resolve(true)
-      }
-    })
-  }
-
-  async _parseTableMeta(tableIdx: number, source: UploadFile | string) {
-    return new Promise((resolve, reject) => {
-      const that = this
-      let steppers = 0
-      const tn = ((this.config.importFromURL ? (source as string).split('/').pop() : (source as UploadFile).name) as string)
+      const tn = `NC_IMPORT_TABLE_${(
+        (this.config.importFromURL ? (source as string).split('/').pop() : (source as UploadFile).name) as string
+      )
         .replace(/[` ~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/g, '_')
-        .trim()!
+        .trim()!}`
+
       this.data[tn] = []
       const parseSource = (this.config.importFromURL ? (source as string) : (source as UploadFile).originFileObj)!
       parse(parseSource, {
@@ -134,12 +94,21 @@ export default class CSVTemplateAdapter {
                   [...Array((row.data as []).length)].map((_, i) => `field_${i + 1}`),
                 )
               }
+            } else {
+              if (steppers >= +that.config.firstRowAsHeaders + 1) {
+                const rowData: Record<string, any> = {}
+                for (let columnIdx = 0; columnIdx < that.headers[tableIdx].length; columnIdx++) {
+                  const column = that.tables[tableIdx].columns[columnIdx]
+                  const data = (row.data as [])[columnIdx] === '' ? null : (row.data as [])[columnIdx]
+                  rowData[column.column_name] = data
+                }
+                that.data[tn].push(rowData)
+              }
             }
           }
         },
         async complete() {
           that.project.tables.push(that.tables[tableIdx])
-          await that._parseTableData(tableIdx, source, tn)
           resolve(true)
         },
         error(e: Error) {
@@ -151,12 +120,12 @@ export default class CSVTemplateAdapter {
 
   async parse() {
     if (this.config.importFromURL) {
-      await this._parseTableMeta(0, this.source as string)
+      await this.import(0, this.source as string)
     } else {
       await Promise.all(
         (this.source as UploadFile[]).map((file: UploadFile, tableIdx: number) =>
           (async (f, idx) => {
-            await this._parseTableMeta(idx, f)
+            await this.import(idx, f)
           })(file, tableIdx),
         ),
       )
