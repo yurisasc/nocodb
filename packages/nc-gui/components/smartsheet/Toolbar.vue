@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { IsPublicInj, inject, ref, useSharedView, useSidebar, useSmartsheetStoreOrThrow, useUIPermission } from '#imports'
+import {
+  IsPublicInj,
+  IsQuickImportInj,
+  inject,
+  ref,
+  useSharedView,
+  useSidebar,
+  useSmartsheetStoreOrThrow,
+  useUIPermission,
+} from '#imports'
 
 const { isGrid, isForm, isGallery, isKanban, isSqlView } = useSmartsheetStoreOrThrow()
 
@@ -10,6 +19,8 @@ const { isUIAllowed } = useUIPermission()
 const { isOpen } = useSidebar('nc-right-sidebar')
 
 const { allowCSVDownload } = useSharedView()
+
+const isQuickImport = inject(IsQuickImportInj, ref(false))
 </script>
 
 <template>
@@ -35,7 +46,7 @@ const { allowCSVDownload } = useSharedView()
 
     <LazySmartsheetToolbarSortListMenu v-if="isGrid || isGallery || isKanban" />
 
-    <LazySmartsheetToolbarShareView v-if="(isForm || isGrid || isKanban || isGallery) && !isPublic" />
+    <LazySmartsheetToolbarShareView v-if="(isForm || isGrid || isKanban || isGallery) && !isPublic && !isQuickImport" />
 
     <LazySmartsheetToolbarExport v-if="(!isPublic && !isUIAllowed('dataInsert')) || (isPublic && allowCSVDownload)" />
     <div class="flex-1" />

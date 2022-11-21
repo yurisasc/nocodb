@@ -264,7 +264,7 @@ const onSearchCloseIconClick = () => {
 
         <div class="flex-1">
           <div
-            v-if="isUIAllowed('table-create')"
+            v-if="isUIAllowed('table-create') && !isQuickImport"
             class="group flex items-center gap-2 pl-5 pr-3 py-2 text-primary/70 hover:(text-primary/100) cursor-pointer select-none"
             @click="openTableCreateDialog"
           >
@@ -440,9 +440,9 @@ const onSearchCloseIconClick = () => {
       </template>
     </a-dropdown>
 
-    <a-divider class="!my-0" />
+    <div v-if="!isQuickImport" class="flex items-start flex-col justify-start px-2 py-3 gap-2">
+      <a-divider class="!my-0" />
 
-    <div class="flex items-start flex-col justify-start px-2 py-3 gap-2">
       <LazyGeneralShareBaseButton
         class="color-transition py-1.5 px-2 text-primary font-bold cursor-pointer select-none hover:text-accent"
       />
