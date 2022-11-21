@@ -19,11 +19,23 @@ const { views, isLoading } = useViews(meta)
 
 const activeView = ref()
 
+const reloadEventHook = createEventHook<void | boolean>()
+
+const reloadViewMetaEventHook = createEventHook<void | boolean>()
+
+const openNewRecordFormHook = createEventHook<void>()
+
 provide(MetaInj, meta)
 
 provide(ActiveViewInj, activeView)
 
 provide(FieldsInj, ref(meta.value?.columns || []))
+
+provide(ReloadViewDataHookInj, reloadEventHook)
+
+provide(ReloadViewMetaHookInj, reloadViewMetaEventHook)
+
+provide(OpenNewRecordFormHookInj, openNewRecordFormHook)
 
 useProvideSmartsheetStore(activeView, meta)
 
