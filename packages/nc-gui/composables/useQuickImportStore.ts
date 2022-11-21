@@ -1,7 +1,6 @@
 import type { UploadFile } from 'ant-design-vue'
-import type { TableType } from 'nocodb-sdk'
-import { generateUniqueTitle, useInjectionState } from '#imports'
-import type { TabItem } from '~/lib'
+import { useInjectionState } from '#imports'
+import type { TabItem, TabType } from '~/lib'
 
 const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
   (importType: 'csv' | 'json' | 'excel', importDataOnly = false) => {
@@ -15,6 +14,8 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
     const { t } = useI18n()
 
     const { $e, $api } = useNuxtApp()
+
+    const { metas, getMeta } = useMetas()
 
     const quickImportTabs = ref<TabItem[]>([])
 
@@ -78,6 +79,8 @@ const [useProvideQuickImportStore, useQuickImportStore] = useInjectionState(
 
     const { table, createTable } = useTable(async (t) => {
       tnMappings.value[table.table_name] = t.title
+      await addQuickImportTab({ title: t.title, id: t.id, type: t.type as TabType })
+      await getMeta(activeQuickImportTab.value?.id!)
     })
 
     const isImportTypeJson = computed(() => importType === 'json')
