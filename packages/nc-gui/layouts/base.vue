@@ -41,24 +41,6 @@ hooks.hook('page:finish', () => {
         v-if="!route.meta.public && signedIn && !route.meta.hideHeader"
         class="flex !bg-primary items-center text-white !pl-2 !pr-5"
       >
-        <div
-          v-if="!route.params.projectType"
-          v-e="['c:navbar:home']"
-          data-testid="nc-noco-brand-icon"
-          class="transition-all duration-200 p-2 cursor-pointer transform hover:scale-105 nc-noco-brand-icon"
-          @click="navigateTo('/')"
-        >
-          <a-tooltip placement="bottom">
-            <template #title>
-              {{ currentVersion }}
-            </template>
-            <div class="flex items-center gap-2">
-              <img width="25" alt="NocoDB" src="~/assets/img/icons/512x512-trans.png" />
-              <img v-show="!isDashboard" width="90" alt="NocoDB" src="~/assets/img/brand/text.png" />
-            </div>
-          </a-tooltip>
-        </div>
-
         <div class="!text-white flex justify-center">
           <div v-show="isLoading" class="flex items-center gap-2 ml-3" data-testid="nc-loading">
             {{ $t('general.loading') }}
