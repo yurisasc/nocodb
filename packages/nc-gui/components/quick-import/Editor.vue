@@ -17,11 +17,7 @@ const meta = computed<TableType | undefined>(() => activeQuickImportTab.value &&
 
 const { views, isLoading } = useViews(meta)
 
-const activeView = computed(() => views.value[0])
-
-const { loadData } = useViewData(meta, activeView)
-
-useProvideSmartsheetStore(activeView, meta)
+const activeView = ref()
 
 provide(MetaInj, meta)
 
@@ -29,9 +25,18 @@ provide(ActiveViewInj, activeView)
 
 provide(FieldsInj, ref(meta.value?.columns || []))
 
+useProvideSmartsheetStore(activeView, meta)
+
+const { loadData } = useViewData(meta, activeView)
+
 watch(activeQuickImportTab, async () => {
   // include the quick import table in metas
   await getMeta(activeQuickImportTab.value?.id!)
+})
+
+watch(views, async () => {
+  // update active view
+  activeView.value = views.value[0]
   // load data
   await loadData()
 })
