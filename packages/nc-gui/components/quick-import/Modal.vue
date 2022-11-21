@@ -365,12 +365,12 @@ provide(IsQuickImportInj, ref(true))
     wrap-class-name="nc-modal-quick-import nc-fullscreen-modal "
     @keydown.esc="dialogShow = false"
   >
+    <template #title>
+      {{ importMeta.header }}
+    </template>
     <a-spin :spinning="isParsingData" tip="Parsing Data ..." size="large">
       <div class="px-5">
-        <div class="prose-xl font-weight-bold my-5">{{ importMeta.header }}</div>
-
         <LazyQuickImportStepper />
-
         <div class="mt-5">
           <!-- Step 1: Upload Data -->
           <a-tabs
