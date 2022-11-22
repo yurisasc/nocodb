@@ -40,15 +40,6 @@ export default {
   <a-layout id="nc-app">
     <a-layout class="!flex-col bg-white">
       <a-layout-header class="flex !bg-primary items-center text-white pl-3 pr-4 shadow-lg">
-        <div class="transition-all duration-200 p-2 cursor-pointer transform hover:scale-105" @click="navigateTo('/')">
-          <a-tooltip placement="bottom">
-            <template #title>
-              {{ currentVersion }}
-            </template>
-            <img width="35" alt="NocoDB" src="~/assets/img/icons/512x512-trans.png" />
-          </a-tooltip>
-        </div>
-
         <div>
           <div class="flex justify-center items-center">
             <div class="flex items-center gap-2 ml-3 text-white">

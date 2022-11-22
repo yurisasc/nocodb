@@ -28,15 +28,6 @@ const logout = () => {
     theme="light"
   >
     <a-dropdown placement="bottom" :trigger="['click']" overlay-class-name="nc-dropdown">
-      <div class="transition-all duration-200 p-2 cursor-pointer transform hover:scale-105 nc-noco-brand-icon">
-        <a-tooltip placement="bottom">
-          <template #title>
-            {{ currentVersion }}
-          </template>
-          <img width="35" alt="NocoDB" src="~/assets/img/icons/512x512-trans.png" />
-        </a-tooltip>
-      </div>
-
       <template v-if="signedIn" #overlay>
         <a-menu class="ml-2 !py-0 min-w-32 leading-8 !rounded nc-menu-account">
           <a-menu-item-group title="User Settings">
