@@ -251,35 +251,6 @@ useEventListener(document, 'keydown', async (e: KeyboardEvent) => {
           :class="isOpen ? 'pl-4' : ''"
           class="flex items-center !bg-primary text-white px-1 gap-1"
         >
-          <div
-            v-if="isOpen && !isSharedBase"
-            v-e="['c:navbar:home']"
-            data-testid="nc-noco-brand-icon"
-            class="w-[29px] min-w-[29px] transition-all duration-200 py-1 pl-1 cursor-pointer transform hover:scale-105 nc-noco-brand-icon"
-            @click="navigateTo('/')"
-          >
-            <a-tooltip placement="bottom">
-              <template #title>
-                {{ currentVersion }}
-              </template>
-              <img width="25" class="-mr-1" alt="NocoDB" src="~/assets/img/icons/512x512-trans.png" />
-            </a-tooltip>
-          </div>
-
-          <a
-            v-if="isOpen && isSharedBase"
-            class="w-[40px] min-w-[40px] transition-all duration-200 p-1 cursor-pointer transform hover:scale-105"
-            href="https://github.com/nocodb/nocodb"
-            target="_blank"
-          >
-            <a-tooltip placement="bottom">
-              <template #title>
-                {{ currentVersion }}
-              </template>
-              <img width="25" alt="NocoDB" src="~/assets/img/icons/512x512-trans.png" />
-            </a-tooltip>
-          </a>
-
           <a-dropdown
             class="h-full min-w-0 flex-1"
             :trigger="['click']"
