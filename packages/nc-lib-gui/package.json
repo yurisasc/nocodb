@@ -1,5 +1,5 @@
 {
-  "name": "ncimblsad",
+  "name": "ncint",
   "version": "0.100.2",
   "license": "AGPL-3.0-or-later",
   "main": "lib/XcLibGui.js",
