@@ -49,8 +49,7 @@ jobs:
           node-version: 16.15.0
           registry-url: 'https://registry.npmjs.org'
       - run: |
-          cd ../.. &&
-          sleep 60 &&
+          export NODE_OPTIONS="--max_old_space_size=16384"
           targetEnv=${{ github.event.inputs.targetEnv || inputs.targetEnv }} node scripts/upgradeNocodbSdk.js &&
           targetEnv=${{ github.event.inputs.targetEnv || inputs.targetEnv }} targetVersion=${{ github.event.inputs.tag || inputs.tag }} node scripts/bumpNcGuiVersion.js &&
           cd packages/nc-gui &&
